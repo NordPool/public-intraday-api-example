@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~  Copyright 2017 Nord Pool.
+  ~  This library is intended to aid integration with Nord Pool’s Intraday API and comes without any warranty. Users of this library are responsible for separately testing and ensuring that it works according to their own standards.
+  ~  Please send feedback to idapi@nordpoolgroup.com.
+  -->
+
+<Configuration>
+
+    <Appenders>
+        <Console name="Console-Appender" target="SYSTEM_OUT">
+            <PatternLayout>
+                <pattern>
+                    %highlight{%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%t] %c{1} --- %msg%n}{FATAL=red blink, ERROR=red, WARN=yellow bold, INFO=blue, DEBUG=green bold, TRACE=blue}
+                </pattern>>
+            </PatternLayout>
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <Root level="DEBUG">
+            <AppenderRef ref="Console-Appender" level="DEBUG"/>
+        </Root>
+    </Loggers>
+</Configuration>

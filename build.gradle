@@ -1,0 +1,64 @@
+group 'nps.norpool.public.api.example'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'org.springframework.boot'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+project.ext {
+    springBootVersion = "1.5.3.RELEASE"
+    npsPublicIntradayApi = "1.000"
+    log4jVersion = "2.6.1"
+}
+
+repositories {
+    mavenLocal()
+    jcenter()
+    mavenCentral()
+}
+
+dependencies {
+    // Spring Boot
+    compile("org.springframework.boot:spring-boot-starter-web:${project.ext.springBootVersion}") {
+        exclude module: "spring-boot-starter-tomcat"
+    }
+    compile("org.springframework.boot:spring-boot-starter-jetty:${project.ext.springBootVersion}")
+    compile("org.springframework.boot:spring-boot-starter-websocket:${project.ext.springBootVersion}") {
+        exclude module: "spring-boot-starter-web"
+    }
+
+
+    // Public intraday library
+    compile("com.npspot:public.intraday.api:${project.ext.npsPublicIntradayApi}")
+
+    //Logger
+    compile("org.apache.logging.log4j:log4j-api:${project.ext.log4jVersion}")
+    compile("org.apache.logging.log4j:log4j-core:${project.ext.log4jVersion}")
+
+
+    // http client
+    compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.2'
+
+    // Commons
+    compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
+
+    // JSON and ZonedDateTime
+    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.8.7'
+}
+
+buildscript {
+    ext {
+        springBootVersion = '1.5.3.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${project.ext.springBootVersion}")
+    }
+}

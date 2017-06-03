@@ -25,3 +25,11 @@ nbdist/
 .nb-gradle/
 target/classes/
 target/
+example/gradle/wrapper/gradle-wrapper.jar
+example/gradle/wrapper/gradle-wrapper.properties
+example/gradlew
+example/gradlew.bat
+gradle/
+gradlew
+gradlew.bat
+out/
