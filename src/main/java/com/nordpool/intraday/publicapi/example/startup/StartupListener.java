@@ -122,18 +122,12 @@ public class StartupListener implements ApplicationListener<ContextRefreshedEven
         LOGGER.info("Will logout in 10 seconds");
         try {
             Thread.sleep(10000);
+            tradingService.sendLogoutCommand();
+            Thread.sleep(3000);
         } catch (InterruptedException e) {
             LOGGER.error(e.getMessage(), e);
         }
-        tradingService.sendLogoutCommand();
 
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         LOGGER.info("Now you can exit the program. Please refer to StartupListener.java for the example scenario.");
-
-
     }
 }

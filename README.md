@@ -18,7 +18,6 @@ In order to connect, you must edit the src\main\resources\example.properties fil
 sso.host=host_from_documentation
 sso.user=your_user
 sso.password=your_password
-sso.authstr=auth string  
 ```
 Additionally, make sure that all the properties in the file point to correct addresses.
 Finally, either run the program using **gradle bootRun** or run the class PublicApiApplication.java.

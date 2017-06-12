@@ -22,11 +22,8 @@ import java.lang.reflect.Type;
 import java.util.LinkedList;
 import java.util.List;
 
-import static java.lang.Math.min;
-
 public class StompFrameHandlerImpl implements StompFrameHandler {
     private static final Logger LOGGER = LogManager.getLogger(StompFrameHandlerImpl.class);
-    private final static int rowsToConsole = 2;
     private final ObjectMapper objectMapper;
     private SubscriptionType subscriptionType;
     public static final String NPS_SEQ_NUM_HEADER = "x-nps-sequenceNo";
@@ -53,12 +50,11 @@ public class StompFrameHandlerImpl implements StompFrameHandler {
         try {
 
             List<?> parsedMessage = objectMapper.readValue((byte[]) payload, getValueType());
-            LOGGER.info("[Frame] Topic: " + headers.getFirst(DESTINATION_TOPIC) + ", " + NPS_SEQ_NUM_HEADER + ": " + headers.getFirst(NPS_SEQ_NUM_HEADER) + ", " + NPS_SNAPSHOT_HEADER + ": " + headers.getFirst(NPS_SNAPSHOT_HEADER) + ", size: " + parsedMessage.size() + " entries");
-            //LOGGER.info("[Frame] --> Payload (truncated): " + parsedMessage.subList(0, min(parsedMessage.size(), rowsToConsole)).toString());
+            LOGGER.info("\n[Frame] Topic: " + headers.getFirst(DESTINATION_TOPIC) + ", " + NPS_SEQ_NUM_HEADER + ": " + headers.getFirst(NPS_SEQ_NUM_HEADER) + ", " + NPS_SNAPSHOT_HEADER + ": " + headers.getFirst(NPS_SNAPSHOT_HEADER) + ", size: " + parsedMessage.size() + " entries");
             int size = parsedMessage.size();
             LOGGER.info("[Frame] --> " + objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(parsedMessage.subList(0, size >= truncateAt ? truncateAt : size)));
             if (parsedMessage.size() > truncateAt) {
-                LOGGER.info("[Frame] == Warning: output above is truncated, shown " + truncateAt + " messages out of " + size + " ==");
+                LOGGER.info("[Frame] == Warning: output above is truncated, shown " + truncateAt + " messages out of " + size + " ==\n");
             }
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);
