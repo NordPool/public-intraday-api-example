@@ -7,6 +7,7 @@
 package com.nordpool.intraday.publicapi.example.service.security;
 
 import com.nordpool.intraday.publicapi.example.service.connection.PropertyValidator;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -24,19 +25,17 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
 public class SSOService {
     private static final Logger LOGGER = LogManager.getLogger(SSOService.class);
-    
 
     // SSO properties
     @Value("${sso.protocol}")
     private String protocol;
-    @Value("${sso.authstr}")
-    private String authStr;
     @Value("${sso.host}")
     private String host;
     @Value("${sso.token.uri}")
@@ -45,6 +44,11 @@ public class SSOService {
     private String user;
     @Value("${sso.password}")
     private String password;
+
+    @Value("${sso.clientId}")
+    private String clientId;
+    @Value("${sso.clientSecret}")
+    private String clientSecret;
 
     private String token = null;
 
@@ -58,17 +62,20 @@ public class SSOService {
         validator.validate(tokenUri, "sso.token.uri");
         validator.validate(user, "sso.user");
         validator.validate(password, "sso.password");
-        validator.validate(password, "sso.authstr");
     }
 
     public String getToken() throws IOException {
         String uri = protocol + "://" + host + tokenUri;
-        LOGGER.info("Getting SSO token from " + uri + " for user " + user + ":" + password);
+        LOGGER.info("Getting SSO token from " + uri + " for user " + user);
         HttpPost httppost = new HttpPost(uri);
         if (StringUtils.isEmpty(token)) {
             try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
                 httppost.addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
-                httppost.addHeader(HttpHeaders.AUTHORIZATION, authStr);
+                String auth = clientId + ":" + clientSecret;
+                byte[] encodedAuth = Base64.encodeBase64(
+                        auth.getBytes(Charset.forName("ISO-8859-1")));
+                String authHeader = "Basic " + new String(encodedAuth);
+                httppost.addHeader(HttpHeaders.AUTHORIZATION, authHeader);
                 httppost.setEntity(new ByteArrayEntity(("grant_type=password&scope=intraday_api&username=" + user + "&password=" + password).getBytes()));
                 CloseableHttpResponse response = httpClient.execute(httppost);
 
@@ -83,7 +90,7 @@ public class SSOService {
         if (StringUtils.isEmpty(token)) {
             LOGGER.error("Haven't got correct token from SSO, empty reply");
         } else {
-            LOGGER.info("Obtained SSO token OK, size: " + token.length() + " bytes.");
+            LOGGER.info("Obtained SSO token successfully.");
         }
 
         return token;

@@ -31,6 +31,7 @@ import java.util.Collections;
 @Service
 public class WebSocketConnector {
     private static final Logger LOGGER = LogManager.getLogger(WebSocketConnector.class);
+    public static final String X_AUTH_TOKEN = "X-AUTH-TOKEN";
 
     // Web Socket properties
     @Value("${web.socket.protocol}")
@@ -97,7 +98,7 @@ public class WebSocketConnector {
         return new StompHeaders() {{
             put(StompHeaders.LOGIN, Collections.singletonList(""));
             put(StompHeaders.PASSCODE, Collections.singletonList(""));
-            put("X-AUTH-TOKEN", Collections.singletonList(ssoService.getToken()));
+            put(X_AUTH_TOKEN, Collections.singletonList(ssoService.getToken()));
         }};
     }
 
