@@ -12,7 +12,7 @@ Before you begin, you should have the library  [https://bitbucket.org/nordpoolsp
 
 Then you may import the code in your favorite IDE and execute **gradle build**.
 
-In order to connect, you must edit the src\main\resources\example.properties file:
+In order to connect, **you must edit the src\main\resources\example.properties** file:
 ```
 #!
 sso.host=host_from_documentation
@@ -23,6 +23,8 @@ sso.password=your_password
 sso.clientId=your_clientId
 sso.clientSecret=your_secret
 ```
+These credentials shall be obtained from [idapi@nordpoolgroup.com](mailto:idapi@nordpoolgroup.com) prior to running the example. 
+
 Additionally, make sure that all the properties in the file point to correct addresses.
 Finally, either run the program using **gradle bootRun** or run the class PublicApiApplication.java.
 
