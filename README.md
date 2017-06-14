@@ -1,6 +1,6 @@
-# Nord Pool Intraday Example code #
+# Nord Pool Intraday API Example Code #
 
-This repository contains the example Client for interaction with Nord Pool Intraday Trading platform. The respective documentation is located at [our Development Portal](https://developers.nordpoolgroup.com/v1.0/docs/id-introduction). 
+This repository contains an example client for interaction with Nord Pool Intraday Trading platform. The respective documentation is located at [our Development Portal](https://developers.nordpoolgroup.com/v1.0/docs/id-introduction). 
 
 ## Disclaimer ##
 
@@ -15,15 +15,10 @@ Then you may import the code in your favorite IDE and execute **gradle build**.
 In order to connect, **you must edit the src\main\resources\example.properties** file:
 ```
 #!
-sso.host=host_from_documentation
 sso.user=your_user
 sso.password=your_password
-
-# These properties are used for SSO Basic Authentication
-sso.clientId=your_clientId
-sso.clientSecret=your_secret
 ```
-These credentials shall be obtained from [idapi@nordpoolgroup.com](mailto:idapi@nordpoolgroup.com) prior to running the example. 
+These credentials shall be obtained from [idapi@nordpoolgroup.com](mailto:idapi@nordpoolgroup.com) prior to running the example.
 
 Additionally, make sure that all the properties in the file point to correct addresses.
 Finally, either run the program using **gradle bootRun** or run the class PublicApiApplication.java.
@@ -34,7 +29,7 @@ The sequence of actions are located in **com/nordpool/intraday/publicapi/example
 
 #Important considerations#
 
-The current program uses the Spring library and its Websocket Stomp client. The usage of it is at your own discretion. 
+The current program is using the Spring library and its Websocket Stomp client. The usage of it is at your own discretion. 
 
 In **com/nordpool/intraday/publicapi/example/service/connection/WebSocketConnector.java** please note  the configuration of maxTextMessageSize. Some messages may be quite large. 
 
