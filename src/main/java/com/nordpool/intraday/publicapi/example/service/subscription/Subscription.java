@@ -12,16 +12,16 @@ import java.util.List;
 import java.util.Objects;
 
 public class Subscription {
-    private SubscriptionType subscriptionType;
+    private Topic topic;
     private String version;
-    private Boolean streaming;
+    private SubscriptionType subscriptionType;
     private Integer area;
     private List<Metadata> metadataParameters;
 
     private Subscription(Builder builder) {
-        subscriptionType = builder.subscriptionType;
+        topic = builder.topic;
         version = builder.version;
-        streaming = builder.streaming;
+        subscriptionType = builder.subscriptionType;
         area = builder.area;
         metadataParameters = builder.metadataParameters;
     }
@@ -30,16 +30,16 @@ public class Subscription {
         return new Builder();
     }
 
-    public SubscriptionType getSubscriptionType() {
-        return subscriptionType;
+    public Topic getTopic() {
+        return topic;
     }
 
     public String getVersion() {
         return version;
     }
 
-    public Boolean isStreaming() {
-        return streaming;
+    public SubscriptionType getSubscriptionType() {
+        return subscriptionType;
     }
 
     public Integer getArea() {
@@ -55,24 +55,24 @@ public class Subscription {
         if (this == o) return true;
         if (!(o instanceof Subscription)) return false;
         Subscription that = (Subscription) o;
-        return subscriptionType == that.subscriptionType &&
+        return topic == that.topic &&
                 Objects.equals(version, that.version) &&
-                Objects.equals(streaming, that.streaming) &&
+                Objects.equals(subscriptionType, that.subscriptionType) &&
                 Objects.equals(area, that.area) &&
                 Objects.equals(metadataParameters, that.metadataParameters);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(subscriptionType, version, streaming, area, metadataParameters);
+        return Objects.hash(topic, version, subscriptionType, area, metadataParameters);
     }
 
     @Override
     public String toString() {
         return "Subscription{" +
-                "subscriptionType=" + subscriptionType +
+                "topic=" + topic +
                 ", version='" + version + '\'' +
-                ", streaming=" + streaming +
+                ", subscriptionType=" + subscriptionType +
                 ", area=" + area +
                 ", metadataParameters=" + metadataParameters +
                 '}';
@@ -80,17 +80,17 @@ public class Subscription {
 
 
     public static final class Builder {
-        private SubscriptionType subscriptionType;
+        private Topic topic;
         private String version;
-        private Boolean streaming;
+        private SubscriptionType subscriptionType;
         private Integer area;
         private List<Metadata> metadataParameters;
 
         private Builder() {
         }
 
-        public Builder withSubscriptionType(SubscriptionType val) {
-            subscriptionType = val;
+        public Builder withTopic(Topic val) {
+            topic = val;
             return this;
         }
 
@@ -99,8 +99,8 @@ public class Subscription {
             return this;
         }
 
-        public Builder withStreaming(Boolean val) {
-            streaming = val;
+        public Builder withSubscriptionType(SubscriptionType val) {
+            subscriptionType = val;
             return this;
         }
 

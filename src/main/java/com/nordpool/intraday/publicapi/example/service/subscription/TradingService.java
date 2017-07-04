@@ -15,7 +15,6 @@ import com.nordpool.id.publicapi.v1.order.request.OrderModificationRequest;
 import com.nordpool.intraday.publicapi.example.service.connection.WebSocketConnector;
 import com.nordpool.intraday.publicapi.example.service.security.SSOService;
 import com.nordpool.intraday.publicapi.example.stompmessagehandler.StompFrameHandlerImpl;
-import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +51,7 @@ public class TradingService {
             StompHeaders stompHeaders = getHeaders(subscription, topic);
 
             LOGGER.info("Subscribing to " + topic);
-            session.subscribe(stompHeaders, new StompFrameHandlerImpl(subscription.getSubscriptionType()));
+            session.subscribe(stompHeaders, new StompFrameHandlerImpl(subscription.getTopic()));
         } else {
             LOGGER.error("Undefined subscription type");
         }
@@ -113,8 +112,8 @@ public class TradingService {
 
 
     private String getTopic(Subscription subscription) {
-        String topic = "/user/" + ssoService.getUser() + "/" + subscription.getVersion() + getDataFlowType(subscription) + subscription.getSubscriptionType().getTopic();
-        switch (subscription.getSubscriptionType()) {
+        String topic = "/user/" + ssoService.getUser() + "/" + subscription.getVersion() + subscription.getSubscriptionType().getType() + subscription.getTopic().getTopic();
+        switch (subscription.getTopic()) {
             // Area aware types
             case CAPACITIES:
             case LOCALVIEW:
@@ -130,14 +129,6 @@ public class TradingService {
                 LOGGER.error("Undefined subscription type");
                 return null;
         }
-    }
-
-    private String getDataFlowType(Subscription subscription) {
-        if (subscription.isStreaming() != null) {
-            return "/" + (subscription.isStreaming() ? "streaming" : "conflated");
-        }
-
-        return StringUtils.EMPTY;
     }
 
     private void sendMessage(String destination, Object order) {

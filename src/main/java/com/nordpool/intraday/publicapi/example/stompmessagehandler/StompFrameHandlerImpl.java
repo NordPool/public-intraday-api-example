@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.nordpool.intraday.publicapi.example.service.subscription.SubscriptionType;
+import com.nordpool.intraday.publicapi.example.service.subscription.Topic;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.messaging.simp.stomp.StompFrameHandler;
@@ -25,18 +25,18 @@ import java.util.List;
 public class StompFrameHandlerImpl implements StompFrameHandler {
     private static final Logger LOGGER = LogManager.getLogger(StompFrameHandlerImpl.class);
     private final ObjectMapper objectMapper;
-    private SubscriptionType subscriptionType;
+    private Topic topic;
     public static final String NPS_SEQ_NUM_HEADER = "x-nps-sequenceNo";
     public static final String NPS_SNAPSHOT_HEADER = "x-nps-snapshot";
     public static final String DESTINATION_TOPIC = "destination";
 
-    public StompFrameHandlerImpl(SubscriptionType subscriptionType) {
+    public StompFrameHandlerImpl(Topic topic) {
         objectMapper = new ObjectMapper();
         objectMapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
         objectMapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.registerModule(new JavaTimeModule());
-        this.subscriptionType = subscriptionType;
+        this.topic = topic;
     }
 
     @Override
@@ -62,6 +62,6 @@ public class StompFrameHandlerImpl implements StompFrameHandler {
     }
 
     private CollectionType getValueType() {
-        return objectMapper.getTypeFactory().constructCollectionType(LinkedList.class, subscriptionType.getDestinationRow());
+        return objectMapper.getTypeFactory().constructCollectionType(LinkedList.class, topic.getDestinationRow());
     }
 }
