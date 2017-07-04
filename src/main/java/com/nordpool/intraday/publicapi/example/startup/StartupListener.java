@@ -10,7 +10,7 @@ import com.nordpool.id.publicapi.v1.order.OrderEntry;
 import com.nordpool.id.publicapi.v1.order.request.OrderEntryRequest;
 import com.nordpool.intraday.publicapi.example.service.connection.WebSocketConnector;
 import com.nordpool.intraday.publicapi.example.service.subscription.Subscription;
-import com.nordpool.intraday.publicapi.example.service.subscription.SubscriptionType;
+import com.nordpool.intraday.publicapi.example.service.subscription.Topic;
 import com.nordpool.intraday.publicapi.example.service.subscription.TradingService;
 import com.nordpool.intraday.publicapi.example.stompmessagehandler.Metadata;
 import org.apache.logging.log4j.LogManager;
@@ -25,6 +25,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+
+import static com.nordpool.intraday.publicapi.example.service.subscription.SubscriptionType.EMPTY;
+import static com.nordpool.intraday.publicapi.example.service.subscription.SubscriptionType.STREAMING;
 
 
 /**
@@ -46,59 +49,59 @@ public class StartupListener implements ApplicationListener<ContextRefreshedEven
         tradingService.connect();
 
         tradingService.subscribe(Subscription.newBuilder()
-                .withSubscriptionType(SubscriptionType.DELIVERY_AREAS)
+                .withTopic(Topic.DELIVERY_AREAS)
                 .withVersion(API_VERSION)
-                .withStreaming(true)
+                .withSubscriptionType(STREAMING)
                 .withArea(1)
                 .build());
 
         tradingService.subscribe(Subscription.newBuilder()
-                .withSubscriptionType(SubscriptionType.ORDER_EXECUTION_REPORT)
+                .withTopic(Topic.ORDER_EXECUTION_REPORT)
                 .withVersion(API_VERSION)
-                .withStreaming(true)
+                .withSubscriptionType(STREAMING)
                 .withArea(1)
                 .build());
 
 
         tradingService.subscribe(Subscription.newBuilder()
-                .withSubscriptionType(SubscriptionType.CONFIGURATION)
+                .withTopic(Topic.CONFIGURATION)
                 .withVersion(API_VERSION)
-                .withStreaming(true)
+                .withSubscriptionType(EMPTY)
                 .build());
 
 
         tradingService.subscribe(Subscription.newBuilder()
-                .withSubscriptionType(SubscriptionType.CONTRACTS)
+                .withTopic(Topic.CONTRACTS)
                 .withVersion(API_VERSION)
-                .withStreaming(true)
+                .withSubscriptionType(STREAMING)
                 .build());
 
 
         tradingService.subscribe(Subscription.newBuilder()
-                .withSubscriptionType(SubscriptionType.LOCALVIEW)
+                .withTopic(Topic.LOCALVIEW)
                 .withVersion(API_VERSION)
                 .withArea(1)
-                .withStreaming(true)
+                .withSubscriptionType(STREAMING)
                 .build());
 
 
         tradingService.subscribe(Subscription.newBuilder()
-                .withSubscriptionType(SubscriptionType.PRIVATE_TRADE)
+                .withTopic(Topic.PRIVATE_TRADE)
                 .withVersion(API_VERSION)
-                .withStreaming(true)
+                .withSubscriptionType(STREAMING)
                 .build());
 
 
         tradingService.subscribe(Subscription.newBuilder()
-                .withSubscriptionType(SubscriptionType.TICKER)
+                .withTopic(Topic.TICKER)
                 .withVersion(API_VERSION)
-                .withStreaming(true)
+                .withSubscriptionType(STREAMING)
                 .build());
 
         tradingService.subscribe(Subscription.newBuilder()
-                .withSubscriptionType(SubscriptionType.CAPACITIES)
+                .withTopic(Topic.CAPACITIES)
                 .withVersion(API_VERSION)
-                .withStreaming(true)
+                .withSubscriptionType(STREAMING)
                 .withArea(1)
                 .withMetadataParameters(Arrays.asList(Metadata.newBuilder()
                         .withName("metadataParameter")
