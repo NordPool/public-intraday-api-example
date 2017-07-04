@@ -26,6 +26,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
+import static java.lang.Boolean.TRUE;
+
 
 /**
  * Startup Listener
@@ -48,14 +50,14 @@ public class StartupListener implements ApplicationListener<ContextRefreshedEven
         tradingService.subscribe(Subscription.newBuilder()
                 .withSubscriptionType(SubscriptionType.DELIVERY_AREAS)
                 .withVersion(API_VERSION)
-                .withStreaming(true)
+                .withStreaming(TRUE)
                 .withArea(1)
                 .build());
 
         tradingService.subscribe(Subscription.newBuilder()
                 .withSubscriptionType(SubscriptionType.ORDER_EXECUTION_REPORT)
                 .withVersion(API_VERSION)
-                .withStreaming(true)
+                .withStreaming(TRUE)
                 .withArea(1)
                 .build());
 
@@ -63,14 +65,13 @@ public class StartupListener implements ApplicationListener<ContextRefreshedEven
         tradingService.subscribe(Subscription.newBuilder()
                 .withSubscriptionType(SubscriptionType.CONFIGURATION)
                 .withVersion(API_VERSION)
-                .withStreaming(true)
                 .build());
 
 
         tradingService.subscribe(Subscription.newBuilder()
                 .withSubscriptionType(SubscriptionType.CONTRACTS)
                 .withVersion(API_VERSION)
-                .withStreaming(true)
+                .withStreaming(TRUE)
                 .build());
 
 
@@ -78,27 +79,27 @@ public class StartupListener implements ApplicationListener<ContextRefreshedEven
                 .withSubscriptionType(SubscriptionType.LOCALVIEW)
                 .withVersion(API_VERSION)
                 .withArea(1)
-                .withStreaming(true)
+                .withStreaming(TRUE)
                 .build());
 
 
         tradingService.subscribe(Subscription.newBuilder()
                 .withSubscriptionType(SubscriptionType.PRIVATE_TRADE)
                 .withVersion(API_VERSION)
-                .withStreaming(true)
+                .withStreaming(TRUE)
                 .build());
 
 
         tradingService.subscribe(Subscription.newBuilder()
                 .withSubscriptionType(SubscriptionType.TICKER)
                 .withVersion(API_VERSION)
-                .withStreaming(true)
+                .withStreaming(TRUE)
                 .build());
 
         tradingService.subscribe(Subscription.newBuilder()
                 .withSubscriptionType(SubscriptionType.CAPACITIES)
                 .withVersion(API_VERSION)
-                .withStreaming(true)
+                .withStreaming(TRUE)
                 .withArea(1)
                 .withMetadataParameters(Arrays.asList(Metadata.newBuilder()
                         .withName("metadataParameter")

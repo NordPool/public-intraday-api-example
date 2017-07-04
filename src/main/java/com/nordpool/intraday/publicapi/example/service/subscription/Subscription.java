@@ -14,7 +14,7 @@ import java.util.Objects;
 public class Subscription {
     private SubscriptionType subscriptionType;
     private String version;
-    private boolean streaming;
+    private Boolean streaming;
     private Integer area;
     private List<Metadata> metadataParameters;
 
@@ -38,7 +38,7 @@ public class Subscription {
         return version;
     }
 
-    public boolean isStreaming() {
+    public Boolean isStreaming() {
         return streaming;
     }
 
@@ -55,9 +55,9 @@ public class Subscription {
         if (this == o) return true;
         if (!(o instanceof Subscription)) return false;
         Subscription that = (Subscription) o;
-        return streaming == that.streaming &&
-                subscriptionType == that.subscriptionType &&
+        return subscriptionType == that.subscriptionType &&
                 Objects.equals(version, that.version) &&
+                Objects.equals(streaming, that.streaming) &&
                 Objects.equals(area, that.area) &&
                 Objects.equals(metadataParameters, that.metadataParameters);
     }
@@ -82,7 +82,7 @@ public class Subscription {
     public static final class Builder {
         private SubscriptionType subscriptionType;
         private String version;
-        private boolean streaming;
+        private Boolean streaming;
         private Integer area;
         private List<Metadata> metadataParameters;
 
@@ -99,7 +99,7 @@ public class Subscription {
             return this;
         }
 
-        public Builder withStreaming(boolean val) {
+        public Builder withStreaming(Boolean val) {
             streaming = val;
             return this;
         }
