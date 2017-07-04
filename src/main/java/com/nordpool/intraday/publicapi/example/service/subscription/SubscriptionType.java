@@ -5,7 +5,7 @@ import org.apache.commons.lang.StringUtils;
 public enum SubscriptionType {
     STREAMING("/streaming"),
     CONFLATED("/conflated"),
-    NONE(StringUtils.EMPTY);
+    EMPTY(StringUtils.EMPTY);
 
     private String type;
 

@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-import static com.nordpool.intraday.publicapi.example.service.subscription.SubscriptionType.NONE;
+import static com.nordpool.intraday.publicapi.example.service.subscription.SubscriptionType.EMPTY;
 import static com.nordpool.intraday.publicapi.example.service.subscription.SubscriptionType.STREAMING;
 
 
@@ -66,7 +66,7 @@ public class StartupListener implements ApplicationListener<ContextRefreshedEven
         tradingService.subscribe(Subscription.newBuilder()
                 .withTopic(Topic.CONFIGURATION)
                 .withVersion(API_VERSION)
-                .withSubscriptionType(NONE)
+                .withSubscriptionType(EMPTY)
                 .build());
 
 
