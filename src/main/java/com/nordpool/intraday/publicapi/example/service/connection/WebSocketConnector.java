@@ -74,7 +74,7 @@ public class WebSocketConnector {
         stompClient.setInboundMessageSizeLimit(maxTextMessageSize);
 
         String url = getUrl();
-        LOGGER.info("Connecting via WebSocket to : " + host + ":" + port);
+        LOGGER.info("Connecting via WebSocket to : " + host + ":" + port );
         try {
             stompClient.connect(url, null, getConnectHeaders(), new StompSessionHandlerAdapterImpl(), new Object[]{});
         } catch (IOException e) {

@@ -66,7 +66,7 @@ public class SSOService {
 
     public String getToken() throws IOException {
         String uri = protocol + "://" + host + tokenUri;
-        LOGGER.info("Getting SSO token from " + uri + " for user " + user);
+        LOGGER.info("Getting SSO token from " + uri + " for user '" + user + "' with password '"+ password+"'");
         HttpPost httppost = new HttpPost(uri);
         if (StringUtils.isEmpty(token)) {
             try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
