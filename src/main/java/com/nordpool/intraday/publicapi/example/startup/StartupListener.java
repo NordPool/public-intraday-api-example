@@ -21,6 +21,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -122,13 +123,18 @@ public class StartupListener implements ApplicationListener<ContextRefreshedEven
                 .build());
 
         // Wait some time, before disconnecting to receive messages via WebSocket
-        LOGGER.info("Will logout in 10 seconds");
+
+
         try {
-            Thread.sleep(10000);
+            Thread.sleep(2000);
+            LOGGER.fatal("Will wait for Enter to close the subscription.");
+            System.in.read(); // wait for user
             tradingService.sendLogoutCommand();
             Thread.sleep(3000);
         } catch (InterruptedException e) {
             LOGGER.error(e.getMessage(), e);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         LOGGER.info("Now you can exit the program. Please refer to StartupListener.java for the example scenario.");
