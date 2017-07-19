@@ -10,7 +10,7 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 project.ext {
-    springBootVersion = "1.5.3.RELEASE"
+    springBootVersion = "1.5.4.RELEASE"
     npsPublicIntradayApi = "1.005"
     log4jVersion = "2.6.1"
 }
@@ -21,6 +21,7 @@ repositories {
     mavenCentral()
 }
 
+ext['jetty.version'] = '9.4.6.v20170531'
 dependencies {
     // Spring Boot
     compile("org.springframework.boot:spring-boot-starter-web:${project.ext.springBootVersion}") {
