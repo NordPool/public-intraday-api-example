@@ -11,7 +11,7 @@ targetCompatibility = 1.8
 
 project.ext {
     springBootVersion = "1.5.4.RELEASE"
-    npsPublicIntradayApi = "1.005"
+    npsPublicIntradayApi = "1.006"
     log4jVersion = "2.6.1"
 }
 
