@@ -50,9 +50,10 @@ public class StompFrameHandlerImpl implements StompFrameHandler {
         try {
 
             List<?> parsedMessage = objectMapper.readValue((byte[]) payload, getValueType());
-            LOGGER.info("\n[Frame] Topic: " + headers.getFirst(DESTINATION_TOPIC) + ", " + NPS_SEQ_NUM_HEADER + ": " + headers.getFirst(NPS_SEQ_NUM_HEADER) + ", " + NPS_SNAPSHOT_HEADER + ": " + headers.getFirst(NPS_SNAPSHOT_HEADER) + ", size: " + parsedMessage.size() + " entries");
             int size = parsedMessage.size();
-            LOGGER.info("[Frame] --> " + objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(parsedMessage.subList(0, size >= truncateAt ? truncateAt : size)));
+            LOGGER.info("[Frame " + headers.getFirst(DESTINATION_TOPIC) + ", " + NPS_SEQ_NUM_HEADER + ": " + headers.getFirst(NPS_SEQ_NUM_HEADER) + ", "
+                    + NPS_SNAPSHOT_HEADER + ": " + headers.getFirst(NPS_SNAPSHOT_HEADER) + ", size: " + parsedMessage.size() + " entries] -- >\n "
+                    + objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(parsedMessage.subList(0, size >= truncateAt ? truncateAt : size)));
             if (parsedMessage.size() > truncateAt) {
                 LOGGER.info("[Frame] == Warning: output above is truncated, shown " + truncateAt + " messages out of " + size + " ==\n");
             }
