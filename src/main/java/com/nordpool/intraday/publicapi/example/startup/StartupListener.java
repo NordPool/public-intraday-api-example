@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
+import static com.nordpool.intraday.publicapi.example.service.subscription.SubscriptionType.CONFLATED;
 import static com.nordpool.intraday.publicapi.example.service.subscription.SubscriptionType.EMPTY;
 import static com.nordpool.intraday.publicapi.example.service.subscription.SubscriptionType.STREAMING;
 
@@ -68,6 +69,7 @@ public class StartupListener implements ApplicationListener<ContextRefreshedEven
                 .withTopic(Topic.CONFIGURATION)
                 .withVersion(API_VERSION)
                 .withSubscriptionType(EMPTY)
+                .withIsGzipped(true)
                 .build());
 
 
@@ -83,6 +85,7 @@ public class StartupListener implements ApplicationListener<ContextRefreshedEven
                 .withVersion(API_VERSION)
                 .withArea(1)
                 .withSubscriptionType(STREAMING)
+                .withIsGzipped(true)
                 .build());
 
 
@@ -97,6 +100,13 @@ public class StartupListener implements ApplicationListener<ContextRefreshedEven
                 .withTopic(Topic.TICKER)
                 .withVersion(API_VERSION)
                 .withSubscriptionType(STREAMING)
+                .build());
+
+        tradingService.subscribe(Subscription.newBuilder()
+                .withTopic(Topic.PUBLIC_STATISTICS)
+                .withVersion(API_VERSION)
+                .withSubscriptionType(CONFLATED)
+                .withArea(1)
                 .build());
 
         tradingService.subscribe(Subscription.newBuilder()

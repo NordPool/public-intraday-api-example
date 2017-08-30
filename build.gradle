@@ -11,8 +11,9 @@ targetCompatibility = 1.8
 
 project.ext {
     springBootVersion = "1.5.4.RELEASE"
-    npsPublicIntradayApi = "1.006"
+    npsPublicIntradayApi = "1.015"
     log4jVersion = "2.6.1"
+    commonsIoVersion = "1.3.2"
 }
 
 repositories {
@@ -40,6 +41,7 @@ dependencies {
     compile("org.apache.logging.log4j:log4j-api:${project.ext.log4jVersion}")
     compile("org.apache.logging.log4j:log4j-core:${project.ext.log4jVersion}")
 
+    compile group: 'org.apache.commons', name: 'commons-io', version: project.ext.commonsIoVersion
 
     // http client
     compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.2'

@@ -17,6 +17,7 @@ public class Subscription {
     private SubscriptionType subscriptionType;
     private Integer area;
     private List<Metadata> metadataParameters;
+    private Boolean isGzipped;
 
     private Subscription(Builder builder) {
         topic = builder.topic;
@@ -24,10 +25,22 @@ public class Subscription {
         subscriptionType = builder.subscriptionType;
         area = builder.area;
         metadataParameters = builder.metadataParameters;
+        isGzipped = builder.isGzipped;
     }
 
     public static Builder newBuilder() {
         return new Builder();
+    }
+
+    public static Builder newBuilder(Subscription copy) {
+        Builder builder = new Builder();
+        builder.topic = copy.topic;
+        builder.version = copy.version;
+        builder.subscriptionType = copy.subscriptionType;
+        builder.area = copy.area;
+        builder.metadataParameters = copy.metadataParameters;
+        builder.isGzipped = copy.isGzipped;
+        return builder;
     }
 
     public Topic getTopic() {
@@ -48,6 +61,10 @@ public class Subscription {
 
     public List<Metadata> getMetadataParameters() {
         return metadataParameters;
+    }
+
+    public Boolean getGzipped() {
+        return isGzipped;
     }
 
     @Override
@@ -85,6 +102,7 @@ public class Subscription {
         private SubscriptionType subscriptionType;
         private Integer area;
         private List<Metadata> metadataParameters;
+        private Boolean isGzipped;
 
         private Builder() {
         }
@@ -111,6 +129,17 @@ public class Subscription {
 
         public Builder withMetadataParameters(List<Metadata> val) {
             metadataParameters = val;
+            return this;
+        }
+
+        /**
+         * Sets the {@code isGzipped} and returns a reference to this Builder so that the methods can be chained together.
+         *
+         * @param val the {@code isGzipped} to set
+         * @return a reference to this Builder
+         */
+        public Builder withIsGzipped(Boolean val) {
+            isGzipped = val;
             return this;
         }
 

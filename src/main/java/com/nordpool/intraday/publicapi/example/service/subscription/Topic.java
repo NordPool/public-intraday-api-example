@@ -7,18 +7,26 @@
 package com.nordpool.intraday.publicapi.example.service.subscription;
 
 
-import com.nordpool.id.publicapi.v1.*;
+import com.nordpool.id.publicapi.v1.CapacityRow;
+import com.nordpool.id.publicapi.v1.ConfigurationRow;
+import com.nordpool.id.publicapi.v1.ContractRow;
+import com.nordpool.id.publicapi.v1.DeliveryAreaRow;
+import com.nordpool.id.publicapi.v1.LocalViewRow;
+import com.nordpool.id.publicapi.v1.OrderExecutionReport;
+import com.nordpool.id.publicapi.v1.PrivateTradeRow;
+import com.nordpool.id.publicapi.v1.PublicTradeRow;
+import com.nordpool.id.publicapi.v1.statistic.PublicStatisticRow;
 
 public enum Topic {
 
-    // /user/<username>/<version>/<streaming>/localview/<areaId>
+    // /user/<username>/<version>/<streaming>/localview/<deliveryAreaId>
     LOCALVIEW(LocalViewRow.class, "/localview/"),
 
     // /user/<username>/<version>/capacities/<areaId>
     CAPACITIES(CapacityRow.class, "/capacities/"),
 
     // /user/<username>/<version>/<streaming>/deliveryAreas
-    DELIVERY_AREAS(AreaRow.class, "/deliveryAreas"),
+    DELIVERY_AREAS(DeliveryAreaRow.class, "/deliveryAreas"),
 
     // /user/<username>/<version>/configuration
     CONFIGURATION(ConfigurationRow.class, "/configuration"),
@@ -33,7 +41,10 @@ public enum Topic {
     PRIVATE_TRADE(PrivateTradeRow.class, "/privateTrade"),
 
     // /user/<username>/<version>/<streaming>/ticker
-    TICKER(PublicTradeRow.class, "/ticker");
+    TICKER(PublicTradeRow.class, "/ticker"),
+
+    // /user/<username>/<version>/<streaming>/publicStatistics/<deliveryAreaId>
+    PUBLIC_STATISTICS(PublicStatisticRow.class, "/publicStatistics/");
 
     Topic(Class<?> destinationRow, String topic) {
         this.destinationRow = destinationRow;

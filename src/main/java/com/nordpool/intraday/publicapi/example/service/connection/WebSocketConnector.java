@@ -30,18 +30,32 @@ import java.util.Collections;
 
 @Service
 public class WebSocketConnector {
-    private static final Logger LOGGER = LogManager.getLogger(WebSocketConnector.class);
+
     public static final String X_AUTH_TOKEN = "X-AUTH-TOKEN";
+
+    private static final Logger LOGGER = LogManager.getLogger(WebSocketConnector.class);
 
     // Web Socket properties
     @Value("${web.socket.protocol}")
     private String protocol;
+
+    @Value("${web.socket.protocol.ssl}")
+    private String protocolSSL;
+
     @Value("${web.socket.host}")
     private String host;
+
     @Value("${web.socket.port}")
     private String port;
+
+    @Value("${web.socket.port.ssl}")
+    private String portSSL;
+
     @Value("${web.socket.uri}")
     private String uri;
+
+    @Value("${web.socket.usessl}")
+    private boolean useSSL;
 
     // Jetty properties
     @Value("${max.text.message.size}")
@@ -64,34 +78,41 @@ public class WebSocketConnector {
         validator.validate(maxTextMessageSize, "max.text.message.size");
     }
 
-    public void connect()  {
+    public void connect() {
         ClientContainer clientContainer = ((ClientContainer) ContainerProvider.getWebSocketContainer());
         clientContainer.getClient().getPolicy().setMaxTextMessageSize(maxTextMessageSize);
+
         WebSocketStompClient stompClient = new WebSocketStompClient(new SockJsClient(Collections.singletonList(
                 new WebSocketTransport(new StandardWebSocketClient(clientContainer))
         )));
         stompClient.setMessageConverter(new SimpleMessageConverter());
         stompClient.setInboundMessageSizeLimit(maxTextMessageSize);
 
+
         String url = getUrl();
-        LOGGER.info("Connecting via WebSocket to : " + host + ":" + port );
+        LOGGER.info("Connecting via WebSocket to : " + url);
         try {
             stompClient.connect(url, null, getConnectHeaders(), new StompSessionHandlerAdapterImpl(), new Object[]{});
         } catch (IOException e) {
             LOGGER.error(e);
         }
 
-
     }
-
 
     public StompSession getSession() {
         return mySession;
     }
 
-
     private String getUrl() {
+        return useSSL ? securedUrl() : unsecuredUrl();
+    }
+
+    private String unsecuredUrl() {
         return protocol + "://" + host + ":" + port + uri;
+    }
+
+    private String securedUrl() {
+        return protocolSSL + "://" + host + ":" + portSSL + uri;
     }
 
     private StompHeaders getConnectHeaders() throws IOException {
@@ -108,7 +129,6 @@ public class WebSocketConnector {
             LOGGER.info("Connected successfully, SessionID = " + session.getSessionId());
             mySession = session;
         }
-
 
         @Override
         public void handleException(StompSession session, StompCommand command,

@@ -49,9 +49,8 @@ public class TradingService {
         String topic = getTopic(subscription);
         if (topic != null) {
             StompHeaders stompHeaders = getHeaders(subscription, topic);
-
             LOGGER.info("Subscribing to " + topic);
-            session.subscribe(stompHeaders, new StompFrameHandlerImpl(subscription.getTopic()));
+            session.subscribe(stompHeaders, new StompFrameHandlerImpl(subscription));
         } else {
             LOGGER.error("Undefined subscription type");
         }
@@ -117,14 +116,15 @@ public class TradingService {
             // Area aware types
             case CAPACITIES:
             case LOCALVIEW:
-                return topic + subscription.getArea();
+            case PUBLIC_STATISTICS:
+                return topic + subscription.getArea() + isGzipped(subscription);
             case CONFIGURATION:
             case CONTRACTS:
             case DELIVERY_AREAS:
             case ORDER_EXECUTION_REPORT:
             case PRIVATE_TRADE:
             case TICKER:
-                return topic;
+                return topic + isGzipped(subscription);
             default:
                 LOGGER.error("Undefined subscription type");
                 return null;
@@ -143,5 +143,10 @@ public class TradingService {
         } catch (JsonProcessingException e) {
             LOGGER.error(e.getMessage(), e);
         }
+    }
+
+    private String isGzipped(Subscription subscription) {
+        if (subscription.getGzipped() == null) return "";
+        return subscription.getGzipped() ? "/gzip" : "";
     }
 }
