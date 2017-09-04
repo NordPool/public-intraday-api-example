@@ -11,7 +11,7 @@ targetCompatibility = 1.8
 
 project.ext {
     springBootVersion = "1.5.4.RELEASE"
-    npsPublicIntradayApi = "1.016"
+    npsPublicIntradayApi = "1.017"
     log4jVersion = "2.6.1"
     commonsIoVersion = "1.3.2"
 }
@@ -55,7 +55,7 @@ dependencies {
 
 buildscript {
     ext {
-        springBootVersion = '1.5.3.RELEASE'
+        springBootVersion = '1.5.4.RELEASE'
     }
     repositories {
         mavenCentral()
