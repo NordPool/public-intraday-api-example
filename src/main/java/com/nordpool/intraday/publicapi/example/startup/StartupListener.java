@@ -129,7 +129,7 @@ public class StartupListener implements ApplicationListener<ContextRefreshedEven
         LOGGER.info("Attempting to send an incorrect order, you will see the rejection message in the log.");
         tradingService.sendEntryOrderRequest(OrderEntryRequest.newBuilder()
                 .withRequestId(String.valueOf(UUID.randomUUID()))
-                .withOrders(Arrays.asList(OrderEntry.newBuilder().withClientOrderId("Something").build()))
+                .withOrders(Arrays.asList(OrderEntry.newBuilder().withClientOrderId(UUID.randomUUID()).build()))
                 .build());
 
         // Wait some time, before disconnecting to receive messages via WebSocket
