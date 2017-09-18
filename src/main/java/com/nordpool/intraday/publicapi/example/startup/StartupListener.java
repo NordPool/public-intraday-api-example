@@ -16,7 +16,6 @@ import com.nordpool.intraday.publicapi.example.stompmessagehandler.Metadata;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Service;
@@ -41,8 +40,6 @@ public class StartupListener implements ApplicationListener<ContextRefreshedEven
     private static final String API_VERSION = "v1";
     @Autowired
     private TradingService tradingService;
-    @Autowired
-    private ApplicationContext context;
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
