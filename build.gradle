@@ -11,7 +11,6 @@ targetCompatibility = 1.8
 
 project.ext {
     springBootVersion = "1.5.4.RELEASE"
-    npsPublicIntradayApi = "1.025"
     log4jVersion = "2.6.1"
     commonsIoVersion = "1.3.2"
 }
@@ -35,7 +34,7 @@ dependencies {
 
 
     // Public intraday library
-    compile("com.npspot:public.intraday.api:${project.ext.npsPublicIntradayApi}")
+    compile("com.npspot:public.intraday.api:${npsPublicIntradayApi}")
 
     //Logger
     compile("org.apache.logging.log4j:log4j-api:${project.ext.log4jVersion}")

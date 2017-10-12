@@ -26,9 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-import static com.nordpool.intraday.publicapi.example.service.subscription.SubscriptionType.CONFLATED;
-import static com.nordpool.intraday.publicapi.example.service.subscription.SubscriptionType.EMPTY;
-import static com.nordpool.intraday.publicapi.example.service.subscription.SubscriptionType.STREAMING;
+import static com.nordpool.intraday.publicapi.example.service.subscription.SubscriptionType.*;
 
 
 /**
@@ -124,10 +122,11 @@ public class StartupListener implements ApplicationListener<ContextRefreshedEven
             e.printStackTrace();
         }
         LOGGER.info("Attempting to send an incorrect order, you will see the rejection message in the log.");
-        tradingService.sendEntryOrderRequest(OrderEntryRequest.newBuilder()
+        tradingService.sendEntryOrderRequest(new OrderEntryRequest()
                 .withRequestId(String.valueOf(UUID.randomUUID()))
-                .withOrders(Arrays.asList(OrderEntry.newBuilder().withClientOrderId(UUID.randomUUID()).build()))
-                .build());
+                .withOrders(Arrays.asList(new OrderEntry()
+                        .withClientOrderId(UUID.randomUUID())))
+        );
 
         // Wait some time, before disconnecting to receive messages via WebSocket
 
