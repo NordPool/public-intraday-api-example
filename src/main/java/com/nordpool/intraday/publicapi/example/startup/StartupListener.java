@@ -116,11 +116,12 @@ public class StartupListener implements ApplicationListener<ContextRefreshedEven
                         }})
                         .build()))
                 .build());
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+
+
+        // ---- EXAMPLES - comment / uncomment one by one as needed ----
+
+        /* EXAMPLE #1: Sending an invalid order */
+        waitabit(5000);
         LOGGER.info("Attempting to send an incorrect order, you will see the rejection message in the log.");
         tradingService.sendEntryOrderRequest(new OrderEntryRequest()
                 .withRequestId(String.valueOf(UUID.randomUUID()))
@@ -128,21 +129,35 @@ public class StartupListener implements ApplicationListener<ContextRefreshedEven
                         .withClientOrderId(UUID.randomUUID())))
         );
 
+        /* EXAMPLE #2: Refreshing the token
+         * Supposed to be called repeatedly anytime within the expiration time which is ATM 60 minutes.
+         */
+        LOGGER.info("Attempting to refresh the token...");
+        waitabit(5000);
+        tradingService.performTokenRefresh();
+
         // Wait some time, before disconnecting to receive messages via WebSocket
-
-
+        waitabit(3000);
         try {
-            Thread.sleep(2000);
             LOGGER.fatal("Will wait for Enter to close the subscription.");
             System.in.read(); // wait for user
+            System.in.read(); // wait for user
             tradingService.sendLogoutCommand();
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            LOGGER.error(e.getMessage(), e);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
+        waitabit(1000);
+
         LOGGER.info("Now you can exit the program. Please refer to StartupListener.java for the example scenario.");
     }
+
+    private void waitabit(long millis){
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

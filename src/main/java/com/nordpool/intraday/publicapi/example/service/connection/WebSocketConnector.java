@@ -119,7 +119,7 @@ public class WebSocketConnector {
         return new StompHeaders() {{
             put(StompHeaders.LOGIN, Collections.singletonList(""));
             put(StompHeaders.PASSCODE, Collections.singletonList(""));
-            put(X_AUTH_TOKEN, Collections.singletonList(ssoService.getToken()));
+            put(X_AUTH_TOKEN, Collections.singletonList(ssoService.getNewToken()));
         }};
     }
 

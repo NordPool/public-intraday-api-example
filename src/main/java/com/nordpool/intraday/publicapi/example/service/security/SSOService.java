@@ -64,11 +64,18 @@ public class SSOService {
         validator.validate(password, "sso.password");
     }
 
-    public String getToken() throws IOException {
+
+    public String getToken() {
+        return token;
+    }
+
+    public String getNewToken() throws IOException {
+
         String uri = protocol + "://" + host + tokenUri;
         LOGGER.info("Getting SSO token from " + uri + " for user '" + user + "' with password '"+ password+"'");
         HttpPost httppost = new HttpPost(uri);
-        if (StringUtils.isEmpty(token)) {
+
+        // if (StringUtils.isEmpty(token)) {
             try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
                 httppost.addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
                 String auth = clientId + ":" + clientSecret;
@@ -86,7 +93,7 @@ public class SSOService {
                 }
 
             }
-        }
+        //}
         if (StringUtils.isEmpty(token)) {
             LOGGER.error("Haven't got correct token from SSO, empty reply");
         } else {

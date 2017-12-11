@@ -10,17 +10,21 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nordpool.id.publicapi.v1.command.Command;
 import com.nordpool.id.publicapi.v1.command.CommandType;
+import com.nordpool.id.publicapi.v1.command.TokenRefreshCommand;
 import com.nordpool.id.publicapi.v1.order.request.OrderEntryRequest;
 import com.nordpool.id.publicapi.v1.order.request.OrderModificationRequest;
 import com.nordpool.intraday.publicapi.example.service.connection.WebSocketConnector;
 import com.nordpool.intraday.publicapi.example.service.security.SSOService;
 import com.nordpool.intraday.publicapi.example.stompmessagehandler.StompFrameHandlerImpl;
+import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
 
 @Service
 public class TradingService {
@@ -69,8 +73,30 @@ public class TradingService {
 
     public void sendLogoutCommand() {
         sendMessage("/v1/command", new Command(CommandType.LOGOUT));
+    }
+
+    /**
+     * Performing a token refresh.
+     */
+    public void performTokenRefresh() {
+        String existingToken = ssoService.getToken();
+        String newToken = null;
+        try {
+            newToken = ssoService.getNewToken();
+        } catch (IOException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+
+        if (!StringUtils.isEmpty(newToken)) {
+            sendMessage("/v1/command",
+                    new TokenRefreshCommand().withOldToken(existingToken).withNewToken(newToken).withType(CommandType.TOKEN_REFRESH));
+        } else
+        {
+            LOGGER.error("Could not fetch a new token.");
+        }
 
     }
+
 
     private StompHeaders getHeaders(Subscription subscription, String topic) {
         StompHeaders stompHeaders = new StompHeaders();
@@ -131,15 +157,15 @@ public class TradingService {
         }
     }
 
-    private void sendMessage(String destination, Object order) {
-        LOGGER.info("Sending to: " + destination + " message: " + order);
+    private void sendMessage(String destination, Object msg) {
+        LOGGER.info("Sending to: " + destination + " message: " + msg);
         StompSession session = getStompSession();
         if (session == null) {
             return;
         }
 
         try {
-            session.send(destination, mapper.writeValueAsString(order).getBytes());
+            session.send(destination, mapper.writeValueAsString(msg).getBytes());
         } catch (JsonProcessingException e) {
             LOGGER.error(e.getMessage(), e);
         }
