@@ -6,8 +6,9 @@
 
 package com.nordpool.intraday.publicapi.example.startup;
 
-import com.nordpool.id.publicapi.v1.order.OrderEntry;
+import com.nordpool.id.publicapi.v1.order.*;
 import com.nordpool.id.publicapi.v1.order.request.OrderEntryRequest;
+import com.nordpool.id.publicapi.v1.order.request.OrderModificationRequest;
 import com.nordpool.intraday.publicapi.example.service.connection.WebSocketConnector;
 import com.nordpool.intraday.publicapi.example.service.subscription.Subscription;
 import com.nordpool.intraday.publicapi.example.service.subscription.Topic;
@@ -21,13 +22,13 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
 import static com.nordpool.intraday.publicapi.example.service.subscription.SubscriptionType.*;
-
 
 /**
  * Startup Listener
@@ -59,7 +60,6 @@ public class StartupListener implements ApplicationListener<ContextRefreshedEven
                 .withArea(1)
                 .build());
 
-
         tradingService.subscribe(Subscription.newBuilder()
                 .withTopic(Topic.CONFIGURATION)
                 .withVersion(API_VERSION)
@@ -67,13 +67,11 @@ public class StartupListener implements ApplicationListener<ContextRefreshedEven
                 .withIsGzipped(true)
                 .build());
 
-
         tradingService.subscribe(Subscription.newBuilder()
                 .withTopic(Topic.CONTRACTS)
                 .withVersion(API_VERSION)
                 .withSubscriptionType(STREAMING)
                 .build());
-
 
         tradingService.subscribe(Subscription.newBuilder()
                 .withTopic(Topic.LOCALVIEW)
@@ -83,13 +81,11 @@ public class StartupListener implements ApplicationListener<ContextRefreshedEven
                 .withIsGzipped(true)
                 .build());
 
-
         tradingService.subscribe(Subscription.newBuilder()
                 .withTopic(Topic.PRIVATE_TRADE)
                 .withVersion(API_VERSION)
                 .withSubscriptionType(STREAMING)
                 .build());
-
 
         tradingService.subscribe(Subscription.newBuilder()
                 .withTopic(Topic.TICKER)
@@ -138,6 +134,30 @@ public class StartupListener implements ApplicationListener<ContextRefreshedEven
 
         // Wait some time, before disconnecting to receive messages via WebSocket
         waitabit(3000);
+        LOGGER.info("Attempting to send an incorrect order modification request");
+        tradingService.sendModificationOrderRequest(new OrderModificationRequest()
+                .withRequestId(String.valueOf(UUID.randomUUID()))
+                .withOrderModificationType(OrderModificationType.MODI)
+                .withOrders(Arrays.asList(new OrderModification()
+                                .withRevisionNo(1L)
+                                .withPortfolioId("Test portfolio ID")
+                                .withContractIds(Arrays.asList("NI_1381"))
+                                .withText("test order modification execution")
+                                .withClipSize(10L)
+                                .withClipPriceChange(70L)
+                                .withOrderType(OrderType.ICEBERG) // if "orderType"="ICEBERG" then "clipPriceChange" should be passed within the value of 25 till "quantity"
+                                .withUnitPrice(11L) //must be from 1 till 1000000
+                                .withQuantity(100L) //-999900 till 999900
+                                .withTimeInForce(TimeInForce.GTD) // if "timeInForce"="GTD" then "expireTime" should be passed within >= current_time
+                                .withExecutionRestriction(ExecutionRestriction.NON)
+                                .withExpireTime(ZonedDateTime.now().plusHours(1))
+                                .withClientOrderId(UUID.randomUUID())
+                                .withOrderId(String.valueOf(UUID.randomUUID()))
+                        )
+                )
+        );
+
+        // Wait some time, before disconnecting to receive messages via WebSocket
         try {
             LOGGER.fatal("Will wait for Enter to close the subscription.");
             System.in.read(); // wait for user
