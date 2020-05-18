@@ -7,8 +7,11 @@
 package com.nordpool.intraday.publicapi.example.config;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 @SpringBootApplication
 @ComponentScan(basePackages = "com.nordpool.intraday.publicapi.example")
@@ -16,4 +19,9 @@ import org.springframework.context.annotation.PropertySource;
         "classpath:example.properties"
 })
 public class ExampleAppConfig {
+
+    @Bean
+    public TaskScheduler heartbeatScheduler() {
+        return new ThreadPoolTaskScheduler();
+    }
 }

@@ -17,6 +17,7 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
@@ -61,11 +62,17 @@ public class WebSocketConnector {
     @Value("${max.text.message.size}")
     private int maxTextMessageSize;
 
+    @Value("1000")
+    private long heartbeatOutgoingInterval;
+
     @Autowired
     private SSOService ssoService;
 
     @Autowired
     private PropertyValidator validator;
+
+    @Autowired
+    private TaskScheduler heartbeatScheduler;
 
     private StompSession mySession;
 
@@ -87,6 +94,10 @@ public class WebSocketConnector {
         )));
         stompClient.setMessageConverter(new SimpleMessageConverter());
         stompClient.setInboundMessageSizeLimit(maxTextMessageSize);
+
+        // task scheduler and heartbeat value are required to enable heartbeat sending
+        stompClient.setTaskScheduler(heartbeatScheduler);
+        stompClient.setDefaultHeartbeat(new long []{heartbeatOutgoingInterval, 0L});
 
 
         String url = getUrl();
