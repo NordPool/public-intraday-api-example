@@ -62,7 +62,7 @@ public class WebSocketConnector {
     @Value("${max.text.message.size}")
     private int maxTextMessageSize;
 
-    @Value("1000")
+    @Value("${heartbeat.outgoing.interval}")
     private long heartbeatOutgoingInterval;
 
     @Autowired
@@ -83,6 +83,7 @@ public class WebSocketConnector {
         validator.validate(port, "web.socket.port");
         validator.validate(uri, "web.socket.uri");
         validator.validate(maxTextMessageSize, "max.text.message.size");
+        validator.validate(heartbeatOutgoingInterval, "heartbeat.outgoing.interval");
     }
 
     public void connect() {
@@ -95,9 +96,11 @@ public class WebSocketConnector {
         stompClient.setMessageConverter(new SimpleMessageConverter());
         stompClient.setInboundMessageSizeLimit(maxTextMessageSize);
 
-        // task scheduler and heartbeat value are required to enable heartbeat sending
-        stompClient.setTaskScheduler(heartbeatScheduler);
         stompClient.setDefaultHeartbeat(new long []{heartbeatOutgoingInterval, 0L});
+        if (heartbeatOutgoingInterval > 0) {
+            // task scheduler and heartbeat value are required to enable heartbeat sending
+            stompClient.setTaskScheduler(heartbeatScheduler);
+        }
 
 
         String url = getUrl();
