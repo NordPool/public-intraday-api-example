@@ -2,7 +2,7 @@
 
 This repository contains an example client for interaction with Nord Pool Intraday Trading platform. The respective documentation is located at [our Development Portal](https://developers.nordpoolgroup.com/v1.0/docs/id-introduction). 
 
-We have an example code for .NET available at [https://bitbucket.org/nordpoolspot/public-intraday-api-net-example](https://bitbucket.org/nordpoolspot/public-intraday-api-net-example). 
+We have an example code for .NET available at [https://github.com/NordPool/public-intraday-api-net-example](https://github.com/NordPool/public-intraday-api-net-example). 
 
 ## Disclaimer ##
 
@@ -10,7 +10,7 @@ We offer the data transfer object code and client code examples to aid the devel
 
 ## Building ##
 
-Before you begin, you should have the library  [https://bitbucket.org/nordpoolspot/public-intraday-api](https://bitbucket.org/nordpoolspot/public-intraday-api) to be available in your local Maven repository. 
+Before you begin, you should have the library  [https://github.com/NordPool/public-intraday-api](https://github.com/NordPool/public-intraday-api) to be available in your local Maven repository. 
 
 Then you may import the code in your favorite IDE and execute **gradle build**.
 
