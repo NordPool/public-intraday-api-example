@@ -23,10 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.ZonedDateTime;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static com.nordpool.intraday.publicapi.example.service.subscription.SubscriptionType.*;
 
@@ -46,6 +43,7 @@ public class StartupListener implements ApplicationListener<ContextRefreshedEven
         // The current SockJSClient we used captures and prints the exception if unable to connect.
         tradingService.connect();
 
+        // Subscribing to different topics
         tradingService.subscribe(Subscription.newBuilder()
                 .withTopic(Topic.DELIVERY_AREAS)
                 .withVersion(API_VERSION)
@@ -108,7 +106,7 @@ public class StartupListener implements ApplicationListener<ContextRefreshedEven
                 .withMetadataParameters(Arrays.asList(Metadata.newBuilder()
                         .withName("metadataParameter")
                         .withValues(new HashMap<String, List<String>>(1) {{
-                            put("areas", Arrays.asList("39"));
+                            put("areas", Collections.singletonList("39"));
                         }})
                         .build()))
                 .build());
@@ -121,7 +119,7 @@ public class StartupListener implements ApplicationListener<ContextRefreshedEven
         LOGGER.info("Attempting to send an incorrect order, you will see the rejection message in the log.");
         tradingService.sendEntryOrderRequest(new OrderEntryRequest()
                 .withRequestId(String.valueOf(UUID.randomUUID()))
-                .withOrders(Arrays.asList(new OrderEntry()
+                .withOrders(Collections.singletonList(new OrderEntry()
                         .withClientOrderId(UUID.randomUUID())))
         );
 
@@ -145,9 +143,9 @@ public class StartupListener implements ApplicationListener<ContextRefreshedEven
                                 .withText("test order modification execution")
                                 .withClipSize(10L)
                                 .withClipPriceChange(70L)
-                                .withOrderType(OrderType.ICEBERG) // if "orderType"="ICEBERG" then "clipPriceChange" should be passed within the value of 25 till "quantity"
-                                .withUnitPrice(11L) //must be from 1 till 1000000
-                                .withQuantity(100L) //-999900 till 999900
+                                .withOrderType(OrderType.ICEBERG)
+                                .withUnitPrice(11L) //  1 ... 1000000
+                                .withQuantity(100L) // -999900 ... 999900
                                 .withTimeInForce(TimeInForce.GTD) // if "timeInForce"="GTD" then "expireTime" should be passed within >= current_time
                                 .withExecutionRestriction(ExecutionRestriction.NON)
                                 .withExpireTime(ZonedDateTime.now().plusHours(1))
