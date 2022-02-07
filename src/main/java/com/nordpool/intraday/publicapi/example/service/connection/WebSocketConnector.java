@@ -27,6 +27,7 @@ import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 import javax.annotation.PostConstruct;
 import javax.websocket.ContainerProvider;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 
 @Service
@@ -134,6 +135,7 @@ public class WebSocketConnector {
             put(StompHeaders.LOGIN, Collections.singletonList(""));
             put(StompHeaders.PASSCODE, Collections.singletonList(""));
             put(X_AUTH_TOKEN, Collections.singletonList(ssoService.getNewToken()));
+            put(ACCEPT_VERSION, Arrays.asList("1.2","1.1","1.0"));
         }};
     }
 
