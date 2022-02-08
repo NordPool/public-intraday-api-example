@@ -25,24 +25,24 @@ repositories {
 
 dependencies {
     // Spring Boot
-    compile("org.springframework.boot:spring-boot-starter-web:${project.ext.springBootVersion}") {
+    implementation("org.springframework.boot:spring-boot-starter-web:${project.ext.springBootVersion}") {
         exclude module: "spring-boot-starter-tomcat"
     }
-    compile("org.springframework.boot:spring-boot-starter-jetty:${project.ext.springBootVersion}")
-    compile("org.springframework.boot:spring-boot-starter-websocket:${project.ext.springBootVersion}") {
+    implementation("org.springframework.boot:spring-boot-starter-jetty:${project.ext.springBootVersion}")
+    implementation("org.springframework.boot:spring-boot-starter-websocket:${project.ext.springBootVersion}") {
         exclude module: "spring-boot-starter-web"
     }
 
     // Public intraday library
-    implementation("com.npspot:public.intraday.api:${npsPublicIntradayApi}")
+    implementation "com.npspot:public.intraday.api:${npsPublicIntradayApi}"
 
     //Logger
-    implementation("org.apache.logging.log4j:log4j-api:${project.ext.log4jVersion}")
-    implementation("org.apache.logging.log4j:log4j-core:${project.ext.log4jVersion}")
+    implementation "org.apache.logging.log4j:log4j-api:${project.ext.log4jVersion}"
+    implementation "org.apache.logging.log4j:log4j-core:${project.ext.log4jVersion}"
 
     // Commons
-    implementation("commons-io:commons-io:${project.ext.commonsIoVersion}")
-    implementation("org.apache.commons:commons-lang3:${project.ext.commonsLangVersion}")
+    implementation "commons-io:commons-io:${project.ext.commonsIoVersion}"
+    implementation "org.apache.commons:commons-lang3:${project.ext.commonsLangVersion}"
 
     // http client
     implementation "org.apache.httpcomponents:httpclient:${project.ext.httpClientVersion}"
