@@ -5,55 +5,58 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
+apply plugin: "io.spring.dependency-management"
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 project.ext {
-    springBootVersion = "2.6.2"
-    log4jVersion = "2.17.1"
+    springBootVersion = "2.6.8"
+    log4jVersion = "2.17.2"
     commonsIoVersion = "2.11.0"
     commonsLangVersion = "3.12.0"
     httpClientVersion = "4.5.13"
-    jacksonVersion = "2.13.1"
+    jacksonVersion = "2.13.3"
 }
 
 repositories {
     mavenLocal()
+    jcenter()
     mavenCentral()
 }
 
 dependencies {
     // Spring Boot
-    implementation("org.springframework.boot:spring-boot-starter-web:${project.ext.springBootVersion}") {
+    implementation ("org.springframework.boot:spring-boot-starter-web:${project.ext.springBootVersion}") {
         exclude module: "spring-boot-starter-tomcat"
     }
-    implementation("org.springframework.boot:spring-boot-starter-jetty:${project.ext.springBootVersion}")
-    implementation("org.springframework.boot:spring-boot-starter-websocket:${project.ext.springBootVersion}") {
+    implementation "org.springframework.boot:spring-boot-starter-jetty:${project.ext.springBootVersion}"
+    implementation ("org.springframework.boot:spring-boot-starter-websocket:${project.ext.springBootVersion}") {
         exclude module: "spring-boot-starter-web"
     }
 
     // Public intraday library
-    implementation "com.npspot:public.intraday.api:${npsPublicIntradayApi}"
+    implementation ("com.npspot:public.intraday.api:${npsPublicIntradayApi}")
 
     //Logger
-    implementation "org.apache.logging.log4j:log4j-api:${project.ext.log4jVersion}"
-    implementation "org.apache.logging.log4j:log4j-core:${project.ext.log4jVersion}"
+    implementation ("org.apache.logging.log4j:log4j-api:${project.ext.log4jVersion}")
+    implementation ("org.apache.logging.log4j:log4j-core:${project.ext.log4jVersion}")
 
-    // Commons
-    implementation "commons-io:commons-io:${project.ext.commonsIoVersion}"
-    implementation "org.apache.commons:commons-lang3:${project.ext.commonsLangVersion}"
+    implementation group: 'commons-io', name: 'commons-io', version: project.ext.commonsIoVersion
 
     // http client
-    implementation "org.apache.httpcomponents:httpclient:${project.ext.httpClientVersion}"
+    implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: project.ext.httpClientVersion
+
+    // Commons
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: project.ext.commonsLangVersion
 
     // JSON and ZonedDateTime
-    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${project.ext.jacksonVersion}"
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: project.ext.jacksonVersion
 }
 
 buildscript {
     ext {
-        springBootVersion = '2.6.2'
+        springBootVersion = '2.6.8'
     }
     repositories {
         mavenCentral()

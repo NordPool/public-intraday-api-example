@@ -6,14 +6,14 @@
 
 package com.nordpool.intraday.publicapi.example;
 
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import com.nordpool.intraday.publicapi.example.config.ExampleAppConfig;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.WebApplicationType;
 
+@SpringBootApplication
 public class PublicApiApplication {
     public static void main(String[] args) {
         SpringApplication app = new SpringApplication(ExampleAppConfig.class);
-        app.setWebApplicationType(WebApplicationType.NONE); // We do not use embedded server capabilities of Spring boot
         app.run(args);
     }
 }
