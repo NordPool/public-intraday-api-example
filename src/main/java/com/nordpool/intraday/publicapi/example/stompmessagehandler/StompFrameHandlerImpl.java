@@ -47,7 +47,7 @@ public class StompFrameHandlerImpl implements StompFrameHandler {
 
     @Override
     public Type getPayloadType(StompHeaders headers) {
-        return Object.class;
+        return byte[].class;
     }
 
     @Override
