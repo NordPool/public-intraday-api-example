@@ -99,6 +99,13 @@ public class StartupListener implements ApplicationListener<ContextRefreshedEven
                 .build());
 
         tradingService.subscribe(Subscription.newBuilder()
+                .withTopic(Topic.THROTTLING_LIMITS)
+                .withVersion(API_VERSION)
+                .withSubscriptionType(CONFLATED)
+                .withIsGzipped(false)
+                .build());
+
+        tradingService.subscribe(Subscription.newBuilder()
                 .withTopic(Topic.CAPACITIES)
                 .withVersion(API_VERSION)
                 .withSubscriptionType(STREAMING)

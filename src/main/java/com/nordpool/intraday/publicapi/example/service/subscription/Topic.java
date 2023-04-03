@@ -16,6 +16,7 @@ import com.nordpool.id.publicapi.v1.OrderExecutionReport;
 import com.nordpool.id.publicapi.v1.PrivateTradeRow;
 import com.nordpool.id.publicapi.v1.PublicTradeRow;
 import com.nordpool.id.publicapi.v1.statistic.PublicStatisticRow;
+import com.nordpool.id.publicapi.v1.throttlinglimit.ThrottlingLimitsMessage;
 
 public enum Topic {
 
@@ -27,6 +28,9 @@ public enum Topic {
 
     // /user/<username>/<version>/<streaming>/deliveryAreas
     DELIVERY_AREAS(DeliveryAreaRow.class, "/deliveryAreas"),
+
+    // /user/<username>/<version>/<conflated>/throttlingLimits
+    THROTTLING_LIMITS(ThrottlingLimitsMessage.class, "/throttlingLimits"),
 
     // /user/<username>/<version>/configuration
     CONFIGURATION(ConfigurationRow.class, "/configuration"),

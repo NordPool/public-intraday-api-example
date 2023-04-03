@@ -150,6 +150,7 @@ public class TradingService {
             case ORDER_EXECUTION_REPORT:
             case PRIVATE_TRADE:
             case TICKER:
+            case THROTTLING_LIMITS:
                 return topic + isGzipped(subscription);
             default:
                 LOGGER.error("Undefined subscription type");
