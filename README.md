@@ -10,7 +10,7 @@ We offer the data transfer object code and client code examples to aid the devel
 
 ## Building ##
 
-Before you begin, you should have the library  [https://github.com/NordPool/public-intraday-api](https://github.com/NordPool/public-intraday-api) to be available in your local Maven repository. 
+Before you begin, you should have the library  [https://github.com/NordPool/public-intraday-api](https://github.com/NordPool/public-intraday-api) to be available through GitHub packages. 
 
 Then you may import the code in your favorite IDE and execute **gradle build**.
 
@@ -29,7 +29,17 @@ The program will connect to the platform and subscribe to several topics. It als
 
 The sequence of actions are located in **com/nordpool/intraday/publicapi/example/startup/StartupListener.java** source code, which is triggered once the program has started.
 
-#Important considerations#
+## Authenticating to GitHub Packages ##
+
+See more information on [GitHub docs](https://docs.github.com/en/packages/learn-github-packages/introduction-to-github-packages#authenticating-to-github-packages)
+
+GitHub Packages only supports authentication using a personal access token (classic). 
+
+You need an access token to publish, install, and delete private, internal, and public packages.
+
+You can use a personal access token (classic) to authenticate to GitHub Packages or the GitHub API. When you create a personal access token (classic), you can assign the token different scopes depending on your needs. 
+
+## Important considerations ##
 
 The current program is using the Spring library and its Websocket Stomp client. The usage of it is at your own discretion. 
 
