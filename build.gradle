@@ -17,12 +17,21 @@ project.ext {
     commonsLangVersion = "3.12.0"
     httpClientVersion = "4.5.13"
     jacksonVersion = "2.13.3"
+    jacksonVersion = "2.13.3"
+    npsIntradayPublicApi = "1.1.1"
 }
 
 repositories {
     mavenLocal()
     jcenter()
     mavenCentral()
+    maven {
+        url = uri("https://maven.pkg.github.com/NordPool/public-intraday-api")
+        credentials {
+            username "username"
+            password "password"
+        }
+    }
 }
 
 dependencies {
@@ -36,7 +45,9 @@ dependencies {
     }
 
     // Public intraday library
-    implementation ("com.npspot:public.intraday.api:${npsPublicIntradayApi}")
+    implementation ("com.npspot:public.intraday.api:${project.ext.npsIntradayPublicApi}") {
+        exclude group: "com.fasterxml.jackson.core"
+    }
 
     //Logger
     implementation ("org.apache.logging.log4j:log4j-api:${project.ext.log4jVersion}")
