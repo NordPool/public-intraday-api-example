@@ -16,7 +16,7 @@ import com.nordpool.id.publicapi.v1.order.request.OrderModificationRequest;
 import com.nordpool.intraday.publicapi.example.service.connection.WebSocketConnector;
 import com.nordpool.intraday.publicapi.example.service.security.SSOService;
 import com.nordpool.intraday.publicapi.example.stompmessagehandler.StompFrameHandlerImpl;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;

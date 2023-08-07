@@ -8,7 +8,7 @@ package com.nordpool.intraday.publicapi.example.service.security;
 
 import com.nordpool.intraday.publicapi.example.service.connection.PropertyValidator;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
