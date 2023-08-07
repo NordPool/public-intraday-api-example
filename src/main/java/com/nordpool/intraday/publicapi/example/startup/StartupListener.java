@@ -127,7 +127,7 @@ public class StartupListener implements ApplicationListener<ContextRefreshedEven
         tradingService.sendEntryOrderRequest(new OrderEntryRequest()
                 .withRequestId(String.valueOf(UUID.randomUUID()))
                 .withOrders(Collections.singletonList(new OrderEntry()
-                        .withClientOrderId(UUID.randomUUID())))
+                        .withClientOrderId(UUID.randomUUID().toString())))
         );
 
         /* EXAMPLE #2: Refreshing the token
@@ -156,7 +156,7 @@ public class StartupListener implements ApplicationListener<ContextRefreshedEven
                                 .withTimeInForce(TimeInForce.GTD) // if "timeInForce"="GTD" then "expireTime" should be passed within >= current_time
                                 .withExecutionRestriction(ExecutionRestriction.NON)
                                 .withExpireTime(ZonedDateTime.now().plusHours(1))
-                                .withClientOrderId(UUID.randomUUID())
+                                .withClientOrderId(UUID.randomUUID().toString())
                                 .withOrderId(String.valueOf(UUID.randomUUID()))
                         )
                 )
