@@ -1,0 +1,99 @@
+plugins {
+    id 'application'
+    id 'java'
+    id 'java-library'
+    id 'maven-publish'
+}
+
+group 'nps.norpool.public.api.example'
+version = '1.0-SNAPSHOT'
+description = 'NPS.ID.PublicApi.Java.Client'
+
+java.sourceCompatibility = JavaVersion.VERSION_22
+java.targetCompatibility = JavaVersion.VERSION_22
+
+repositories {
+    mavenLocal()
+    maven {
+        url = uri('https://maven.pkg.github.com/NordPool/public-intraday-api')
+        credentials {
+            username ""
+            password ""
+        }
+    }
+
+    maven {
+        url = uri('https://repo.maven.apache.org/maven2/')
+    }
+}
+
+application {
+    mainClass = 'nps.id.publicapi.java.client.ApplicationMain'
+}
+
+project.ext {
+    springBootVersion = "3.3.2"
+    springVersion = "6.1.11"
+    lombokVersion = "1.18.34"
+    jettyVersion = "12.0.11"
+    jacksonVersion = "2.17.2"
+    lang3Version = "3.16.0"
+    log4jVersion = "2.23.1"
+    commonsIoVersion = "2.16.1"
+    httpClientVersion = "4.5.14"
+    auth0JwtVersion = "4.2.1"
+    npsIntradayPublicApi = "1.1.1"
+}
+
+dependencies {
+
+    implementation("org.springframework.boot:spring-boot-starter-parent:${project.ext.springBootVersion}")
+    implementation("org.springframework:spring-websocket:${project.ext.springVersion}")
+    implementation("org.springframework:spring-beans:${project.ext.springVersion}")
+    implementation("org.springframework:spring-core:${project.ext.springVersion}")
+    implementation("org.springframework:spring-context:${project.ext.springVersion}")
+    implementation("org.springframework:spring-messaging:${project.ext.springVersion}")
+    implementation("org.springframework.boot:spring-boot-starter:${project.ext.springBootVersion}")
+    implementation("org.springframework.boot:spring-boot-starter-web:${project.ext.springBootVersion}") {
+        exclude module: "spring-boot-starter-tomcat"
+    }
+    implementation("org.springframework.boot:spring-boot-starter-websocket:${project.ext.springBootVersion}") {
+        exclude module: "spring-boot-starter-web"
+    }
+    implementation("org.springframework.boot:spring-boot-starter-jetty:${project.ext.springBootVersion}")
+    implementation("org.springframework.boot:spring-boot-autoconfigure:${project.ext.springBootVersion}")
+    implementation("org.eclipse.jetty:jetty-util:${project.ext.jettyVersion}")
+    implementation("org.eclipse.jetty:jetty-client:${project.ext.jettyVersion}")
+    implementation("org.eclipse.jetty.websocket:jetty-websocket-core-common:${project.ext.jettyVersion}")
+    implementation("com.fasterxml.jackson.core:jackson-core:${project.ext.jacksonVersion}")
+    implementation("com.fasterxml.jackson.core:jackson-annotations:${project.ext.jacksonVersion}")
+    implementation("com.fasterxml.jackson.core:jackson-databind:${project.ext.jacksonVersion}")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${project.ext.jacksonVersion}")
+    implementation("org.apache.commons:commons-lang3:${project.ext.lang3Version}")
+    implementation("commons-io:commons-io:${project.ext.commonsIoVersion}")
+    implementation("org.apache.logging.log4j:log4j-core:${project.ext.log4jVersion}")
+    implementation("org.apache.logging.log4j:log4j-api:${project.ext.log4jVersion}")
+    implementation("org.apache.httpcomponents:httpclient:${project.ext.httpClientVersion}")
+    implementation("com.auth0:java-jwt:${project.ext.auth0JwtVersion}")
+    implementation("com.npspot:public.intraday.api:${project.ext.npsIntradayPublicApi}") {
+        exclude module: "com.fasterxml.jackson.core"
+    }
+    annotationProcessor("org.projectlombok:lombok:${project.ext.lombokVersion}")
+    compileOnly("org.projectlombok:lombok:${project.ext.lombokVersion}")
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from(components.java)
+        }
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+tasks.withType(Javadoc) {
+    options.encoding = 'UTF-8'
+}

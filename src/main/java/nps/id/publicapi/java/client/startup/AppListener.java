@@ -1,4 +1,4 @@
-package nps.id.publicapi.java.client;
+package nps.id.publicapi.java.client.startup;
 
 import com.nordpool.id.publicapi.v1.ConfigurationRow;
 import com.nordpool.id.publicapi.v1.ContractRow;

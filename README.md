@@ -13,11 +13,13 @@ We offer the data transfer object code and client code examples to aid the devel
 ## Building ##
 
 Before you begin, you should have the library [https://github.com/NordPool/public-intraday-api](https://github.com/NordPool/public-intraday-api) to be available through GitHub packages. 
+For more detailed instruction see **Authenticating to GitHub Packages** section of this document.
 
-Then you may import the code in your favorite IDE and fetch all dependencies with **mvn clean install**.
 
-All the revelant variables for connecting are located in **application.properties** and Maven's **~\.m2\settings.xml** configuration files. 
-Before running the example, user credentials should be updated to **application.properties**:
+Then you may import the code in your favorite IDE and build project with **gradle build** command.
+
+All the relevant variables for connecting are located in [application.properties](/src/main/resources/application.properties) and Gradle's [build.gradle](build.gradle) configuration files. 
+Before running the example, user credentials should be updated to [application.properties](/src/main/resources/application.properties):
 ```
 #!
 credentials.userName=your_user
@@ -26,15 +28,15 @@ credentials.password=your_password
 
 These credentials shall be obtained from [idapi@nordpoolgroup.com](mailto:idapi@nordpoolgroup.com) prior to running the example.
 
-Additionally, make sure that all the other variables in the application.properties file point to correct addresses.
-Finally, build the solution with IntelliJ, or any other Java IDE and run the program using startup class **ApplicationMain.java**.
+Additionally, make sure that all the other variables in the [application.properties](/src/main/resources/application.properties) file point to correct addresses.
+Finally, run the solution with **gradle run** command or by run a startup class [ApplicationMain.java](/src/main/java/nps/id/publicapi/java/client/ApplicationMain.java) with your Java IDE.
 
-The program will create two parallel connections that targets both: new **PMD API** web service and old **Middleware** web service.
-Each connection subscribes to several example topics. It also provides an exanmple of sending messages to Intraday platform.
+The program will create two parallel connections that targets both: new **PMD** web service and old **Middleware** web service.
+Each connection subscribes to several example topics. It also provides an example of sending messages to Intraday platform.
 
 Every communication step, its results or exceptions are printed in console output window.
 
-The sequence of actions are located in **AppListener.java** source code, which is triggered once the program has started.
+The sequence of actions are located in [AppListener.java](/src/main/java/nps/id/publicapi/java/client/startup/AppListener.java) source code, which is triggered once the program has started.
 
 ## Authenticating to GitHub Packages ##
 
@@ -46,26 +48,20 @@ You need an access token to publish, install, and delete private, internal, and 
 
 You can use a personal access token (classic) to authenticate to GitHub Packages or the GitHub API. When you create a personal access token (classic), you can assign the token different scopes depending on your needs. 
 
-Login and access token can be set in Maven's configuration **~\.m2\settings.xml** file:
+Login and access token can be set in Gradle's configuration [build.gradle](build.gradle) file:
 ```
-#!
-<servers>
-    <server>
-        <id>public-intraday-api-repo</id>
-        <username>your_username</username>
-        <password>your_access_token</password>
-    </server>
-</servers>
+credentials {
+    username "your_username"
+    password "your_github_access_token"
+}
 ```
-An id public-intraday-api-repo indicates identifier of custom repository for accessing [Java Intraday API package](https://maven.pkg.github.com/NordPool/public-intraday-api).
-
-More informations about **~\.m2\settings.xml** file can be found at [Settings reference page](https://maven.apache.org/settings.html#servers).
+To access [Java Intraday API package](https://maven.pkg.github.com/NordPool/public-intraday-api) you will need privileges that can be obtained from [idapi@nordpoolgroup.com](mailto:idapi@nordpoolgroup.com).
 
 ## Important considerations ##
 
 The current program is using the Spring library and its Websocket Stomp client. The usage of it is at your own discretion. 
 
-In **WebSocketConnector.java** please note the configuration of maxTextMessageSize and maxByteMessageSize. 
+In [WebSocketConnector.java](/src/main/java/nps/id/publicapi/java/client/connection/WebSocketConnector.java) please note the configuration of maxTextMessageSize and maxByteMessageSize. 
 Some messages may be quite large. 
 
 The example uses ports 8083/443(secured) for establishing the web socket connection with **Middleware** web service and ports 80/443(secured) for establishing web socket connection with **PMD** web service. 
