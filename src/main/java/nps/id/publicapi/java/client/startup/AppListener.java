@@ -45,7 +45,7 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
             var pmdClient = CreateClient(WebSocketClientTarget.PMD);
             var middlewareClient = CreateClient(WebSocketClientTarget.MIDDLEWARE);
 
-//            // Delivery areas
+            // Delivery areas
             SubscribeDeliveryAreas(pmdClient);
 
             // Configurations
@@ -184,8 +184,8 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
             logger.warn("[{}]No valid portfolio to be used for order creation has been found! Check contracts available in SimpleCacheStorage.", stompClient.getClientTarget());
             return;
         }
-        var contract = (ContractRow)exampleContract.get();
-        var portfolio = ((ConfigurationRow)examplePortfolio.get()).getPortfolios().getFirst();
+        var contract = (ContractRow) exampleContract.get();
+        var portfolio = ((ConfigurationRow) examplePortfolio.get()).getPortfolios().getFirst();
         var orderRequest = new OrderEntryRequest()
                 .withRequestId(UUID.randomUUID().toString())
                 .withRejectPartially(false)
@@ -208,7 +208,7 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
 
         // Store created order in simple cache storage for order modification request
         SimpleCacheStorage.getInstance()
-                        .setCache(stompClient.getClientTarget(), OrderEntryRequest.class.getName(), Collections.singletonList(orderRequest), false);
+                .setCache(stompClient.getClientTarget(), OrderEntryRequest.class.getName(), Collections.singletonList(orderRequest), false);
 
         logger.info("[{}]Attempting to send correct order request.", stompClient.getClientTarget());
         stompClient.send(orderRequest, "orderEntryRequest");
@@ -223,7 +223,7 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
             logger.warn("[{}]No valid order to be used for order modification has been found!", stompClient.getClientTarget());
             return;
         }
-        var lastOrderEntry = ((OrderEntryRequest)lastOrder.get()).getOrders().getFirst();
+        var lastOrderEntry = ((OrderEntryRequest) lastOrder.get()).getOrders().getFirst();
 
         var orderModificationRequest = new OrderModificationRequest()
                 .withRequestId(UUID.randomUUID().toString())
