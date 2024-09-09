@@ -4,6 +4,7 @@ import com.nordpool.id.publicapi.v1.ConfigurationRow;
 import com.nordpool.id.publicapi.v1.ContractRow;
 import com.nordpool.id.publicapi.v1.order.*;
 import com.nordpool.id.publicapi.v1.order.request.OrderEntryRequest;
+import com.nordpool.id.publicapi.v1.order.request.OrderModificationRequest;
 import nps.id.publicapi.java.client.connection.clients.StompClient;
 import nps.id.publicapi.java.client.connection.clients.StompClientGenericFactory;
 import nps.id.publicapi.java.client.connection.enums.PublishingMode;
@@ -41,42 +42,67 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
         try {
-            var edgeUiClient = CreateClient(WebSocketClientTarget.EDGE);
-            var middlewareUiClient = CreateClient(WebSocketClientTarget.MIDDLEWARE);
+            var pmdClient = CreateClient(WebSocketClientTarget.PMD);
+            var middlewareClient = CreateClient(WebSocketClientTarget.MIDDLEWARE);
 
-            // Delivery areas
-            SubscribeDeliveryAreas(edgeUiClient);
-            SubscribeDeliveryAreas(middlewareUiClient);
-
-            // Contracts
-            SubscribeContracts(edgeUiClient, PublishingMode.CONFLATED);
-            SubscribeContracts(middlewareUiClient, PublishingMode.CONFLATED);
-
-            SubscribeContracts(edgeUiClient, PublishingMode.STREAMING);
-            SubscribeContracts(middlewareUiClient, PublishingMode.STREAMING);
+//            // Delivery areas
+            SubscribeDeliveryAreas(pmdClient);
 
             // Configurations
-            SubscribeConfigurations(edgeUiClient);
-            SubscribeConfigurations(middlewareUiClient);
+            SubscribeConfigurations(middlewareClient);
+
+            // Order execution report
+            SubscribeOrderExecutionReports(middlewareClient, PublishingMode.STREAMING);
+
+            // Contracts
+            SubscribeContracts(pmdClient, PublishingMode.CONFLATED);
+            SubscribeContracts(middlewareClient, PublishingMode.CONFLATED);
+
+            // Local views
+            SubscribeLocalViews(pmdClient, PublishingMode.STREAMING);
+            SubscribeLocalViews(middlewareClient, PublishingMode.STREAMING);
+
+            // Private trades
+            SubscribePrivateTrades(middlewareClient, PublishingMode.STREAMING);
+
+            // Tickers
+            SubscribeTickers(pmdClient, PublishingMode.STREAMING);
+            SubscribeTickers(middlewareClient, PublishingMode.STREAMING);
+
+            // MyTickers
+            SubscribeMyTickers(pmdClient, PublishingMode.STREAMING);
+            SubscribeMyTickers(middlewareClient, PublishingMode.STREAMING);
+
+            // Public statistics
+            SubscribePublicStatistics(pmdClient, PublishingMode.CONFLATED);
+            SubscribePublicStatistics(middlewareClient, PublishingMode.CONFLATED);
+
+            // Throttling limits
+            SubscribeThrottlingLimits(middlewareClient, PublishingMode.CONFLATED);
 
             // Capacities
-            SubscribeCapacities(edgeUiClient, PublishingMode.CONFLATED);
-            SubscribeCapacities(middlewareUiClient, PublishingMode.CONFLATED);
-
-            SubscribeCapacities(edgeUiClient, PublishingMode.STREAMING);
-            SubscribeCapacities(middlewareUiClient, PublishingMode.STREAMING);
+            SubscribeCapacities(pmdClient, PublishingMode.STREAMING);
+            SubscribeCapacities(middlewareClient, PublishingMode.STREAMING);
 
             // Order
             // We wait some time in hope to get some example contracts and configurations that are needed for preparing example order request
             Thread.sleep(10000);
-            SendOrderRequest(edgeUiClient);
-            SendOrderRequest(middlewareUiClient);
 
-            System.out.print("Press 'x' key to continue logout, unsubscribe and close. . . ");
+            SendOrderRequest(middlewareClient);
+            SendOrderModificationRequest(middlewareClient);
+
+            SendInvalidOrderRequest(middlewareClient);
+            SendInvalidOrderModificationRequest(middlewareClient);
+
+            System.out.println("============================================================ ");
+            System.out.println("Press 'x' key to unsubscribe, logout and close. . . ");
+            System.out.println("============================================================ ");
+
             var key = System.in.read();
             if (key == 120) {
-                edgeUiClient.disconnect();
-                middlewareUiClient.disconnect();
+                pmdClient.disconnect();
+                middlewareClient.disconnect();
+                System.exit(0);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -92,13 +118,48 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
         stompClient.subscribe(subscription);
     }
 
+    private void SubscribeConfigurations(StompClient stompClient) throws SubscriptionFailedException {
+        var subscription = subscribeRequestBuilder.createConfiguration();
+        stompClient.subscribe(subscription);
+    }
+
+    private void SubscribeOrderExecutionReports(StompClient stompClient, PublishingMode publishingMode) throws SubscriptionFailedException {
+        var subscription = subscribeRequestBuilder.createOrderExecutionReport(publishingMode);
+        stompClient.subscribe(subscription);
+    }
+
     private void SubscribeContracts(StompClient stompClient, PublishingMode publishingMode) throws SubscriptionFailedException {
         var subscription = subscribeRequestBuilder.createContracts(publishingMode);
         stompClient.subscribe(subscription);
     }
 
-    private void SubscribeConfigurations(StompClient stompClient) throws SubscriptionFailedException {
-        var subscription = subscribeRequestBuilder.createConfiguration();
+    private void SubscribeLocalViews(StompClient stompClient, PublishingMode publishingMode) throws SubscriptionFailedException {
+        var subscription = subscribeRequestBuilder.createLocalView(publishingMode, _demoArea);
+        stompClient.subscribe(subscription);
+    }
+
+    private void SubscribePrivateTrades(StompClient stompClient, PublishingMode publishingMode) throws SubscriptionFailedException {
+        var subscription = subscribeRequestBuilder.createPrivateTrades(publishingMode);
+        stompClient.subscribe(subscription);
+    }
+
+    private void SubscribeTickers(StompClient stompClient, PublishingMode publishingMode) throws SubscriptionFailedException {
+        var subscription = subscribeRequestBuilder.createTicker(publishingMode);
+        stompClient.subscribe(subscription);
+    }
+
+    private void SubscribeMyTickers(StompClient stompClient, PublishingMode publishingMode) throws SubscriptionFailedException {
+        var subscription = subscribeRequestBuilder.createMyTicker(publishingMode);
+        stompClient.subscribe(subscription);
+    }
+
+    private void SubscribePublicStatistics(StompClient stompClient, PublishingMode publishingMode) throws SubscriptionFailedException {
+        var subscription = subscribeRequestBuilder.createPublicStatistics(publishingMode);
+        stompClient.subscribe(subscription);
+    }
+
+    private void SubscribeThrottlingLimits(StompClient stompClient, PublishingMode publishingMode) throws SubscriptionFailedException {
+        var subscription = subscribeRequestBuilder.createThrottlingLimits(publishingMode);
         stompClient.subscribe(subscription);
     }
 
@@ -112,7 +173,7 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
                 .getFromCache(stompClient.getClientTarget(), ContractRow.class.getName())
                 .stream().findFirst();
         if (exampleContract.isEmpty()) {
-            logger.warn("No valid contract to be used for order creation has been found! Check contracts available in SimpleCacheStorage.");
+            logger.warn("[{}]No valid contract to be used for order creation has been found! Check contracts available in SimpleCacheStorage.", stompClient.getClientTarget());
             return;
         }
 
@@ -120,7 +181,7 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
                 .getFromCache(stompClient.getClientTarget(), ConfigurationRow.class.getName())
                 .stream().findFirst();
         if (examplePortfolio.isEmpty()) {
-            logger.warn("No valid portfolio to be used for order creation has been found! Check contracts available in SimpleCacheStorage.");
+            logger.warn("[{}]No valid portfolio to be used for order creation has been found! Check contracts available in SimpleCacheStorage.", stompClient.getClientTarget());
             return;
         }
         var contract = (ContractRow)exampleContract.get();
@@ -130,6 +191,7 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
                 .withRejectPartially(false)
                 .withOrders(Collections.singletonList(
                         new OrderEntry()
+                                .withText("New order")
                                 .withClientOrderId(UUID.randomUUID().toString())
                                 .withPortfolioId(portfolio.getId())
                                 .withSide(OrderSide.SELL)
@@ -144,6 +206,76 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
                                 .withExpireTime(ZonedDateTime.now().plusHours(6))
                 ));
 
+        // Store created order in simple cache storage for order modification request
+        SimpleCacheStorage.getInstance()
+                        .setCache(stompClient.getClientTarget(), OrderEntryRequest.class.getName(), Collections.singletonList(orderRequest), false);
+
+        logger.info("[{}]Attempting to send correct order request.", stompClient.getClientTarget());
         stompClient.send(orderRequest, "orderEntryRequest");
+    }
+
+    private void SendOrderModificationRequest(StompClient stompClient) {
+        // Get last created order for update purpose
+        var lastOrder = SimpleCacheStorage.getInstance()
+                .getFromCache(stompClient.getClientTarget(), OrderEntryRequest.class.getName())
+                .stream().findFirst();
+        if (lastOrder.isEmpty()) {
+            logger.warn("[{}]No valid order to be used for order modification has been found!", stompClient.getClientTarget());
+            return;
+        }
+        var lastOrderEntry = ((OrderEntryRequest)lastOrder.get()).getOrders().getFirst();
+
+        var orderModificationRequest = new OrderModificationRequest()
+                .withRequestId(UUID.randomUUID().toString())
+                .withOrderModificationType(OrderModificationType.DEAC)
+                .withOrders(Collections.singletonList(
+                        new OrderModification()
+                                .withOrderId("")
+                                .withRevisionNo(0L)
+                                .withText("Modified order")
+                                .withClientOrderId(lastOrderEntry.getClientOrderId())
+                                .withPortfolioId(lastOrderEntry.getPortfolioId())
+                                .withContractIds(lastOrderEntry.getContractIds())
+                                .withOrderType(lastOrderEntry.getOrderType())
+                                .withQuantity(lastOrderEntry.getQuantity())
+                                .withUnitPrice(lastOrderEntry.getUnitPrice())
+                                .withTimeInForce(lastOrderEntry.getTimeInForce())
+                                .withExecutionRestriction(lastOrderEntry.getExecutionRestriction())
+                                .withExpireTime(lastOrderEntry.getExpireTime())
+                                .withClipSize(lastOrderEntry.getClipSize())
+                                .withClipPriceChange(lastOrderEntry.getClipPriceChange())
+                ));
+
+        logger.info("[{}]Attempting to send an correct order modification request.", stompClient.getClientTarget());
+        stompClient.send(orderModificationRequest, "orderModificationRequest");
+    }
+
+    private void SendInvalidOrderRequest(StompClient stompClient) {
+        var invalidOrderRequest = new OrderEntryRequest()
+                .withRequestId(String.valueOf(UUID.randomUUID()))
+                .withRejectPartially(false)
+                .withOrders(Collections.singletonList(new OrderEntry()));
+
+        logger.info("[{}]Attempting to send incorrect order request.", stompClient.getClientTarget());
+        stompClient.send(invalidOrderRequest, "orderEntryRequest");
+    }
+
+    private void SendInvalidOrderModificationRequest(StompClient stompClient) {
+//        var lastOrder = SimpleCacheStorage.getInstance()
+//                .getFromCache(stompClient.getClientTarget(), OrderEntryRequest.class.getName())
+//                .stream().findFirst();
+//        if (lastOrder.isEmpty()) {
+//            logger.warn("No valid order to be used for order modification has been found!");
+//            return;
+//        }
+//        var lastOrderEntry = ((OrderEntryRequest)lastOrder.get()).getOrders().getFirst();
+
+        var orderModificationRequest = new OrderModificationRequest()
+                .withRequestId(UUID.randomUUID().toString())
+                .withOrderModificationType(OrderModificationType.DEAC)
+                .withOrders(Collections.singletonList(new OrderModification()));
+
+        logger.info("[{}]Attempting to send an incorrect order modification request.", stompClient.getClientTarget());
+        stompClient.send(orderModificationRequest, "orderModificationRequest");
     }
 }

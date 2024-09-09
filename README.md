@@ -68,7 +68,7 @@ The current program is using the Spring library and its Websocket Stomp client. 
 In **WebSocketConnector.java** please note the configuration of maxTextMessageSize and maxByteMessageSize. 
 Some messages may be quite large. 
 
-The example uses ports 8083/443(secured) for establishing the web socket connection with **Middleware** web service and ports 80/443(secured) for establishing web socket connection with **PMD UI** web service. 
+The example uses ports 8083/443(secured) for establishing the web socket connection with **Middleware** web service and ports 80/443(secured) for establishing web socket connection with **PMD** web service. 
 If the example doesn't connect to the API, check that the above ports has been opened from your firewall.
 
 ## Questions, comments and error reporting ##
@@ -80,7 +80,7 @@ Please send questions and bug reports to [idapi@nordpoolgroup.com](mailto:idapi@
 Change useSsl property value from false to true.
 ```
 #!
-edge.web.socket.useSsl=true
+pmd.web.socket.useSsl=true
 
 middleware.web.socket.useSsl=true
 ```

@@ -57,6 +57,16 @@ public class StompFrameHandlerImpl implements StompFrameHandler {
 
         try {
             var responseString = "";
+
+            logger.info("[{}][Frame({}):Metadata] : destination={}, sentAt={}, snapshot={}, publishingMode={}, sequenceNumber={}",
+                    clientTarget,
+                    subscription,
+                    destination,
+                    sentAt,
+                    isSnapshot,
+                    publishingMode,
+                    sequenceNumber);
+
             if (subscriptionRequest.getDataType() != null) {
                 var decompressedPayload = subscriptionRequest.isGzipped()
                         ? GZipCompressor.decompress(payloadBytes)
@@ -74,15 +84,8 @@ public class StompFrameHandlerImpl implements StompFrameHandler {
                 logger.info("[{}][Frame({}):ResponseType] : {}", clientTarget, subscription, typeClass);
             } else {
                 responseString = new String(payloadBytes, StandardCharsets.UTF_8);
+                logger.info("[{}][Frame({}):ResponseType] : {}", clientTarget, subscription, String.class.getName());
             }
-            logger.info("[{}][Frame({}):Metadata] : destination={}, sentAt={}, snapshot={}, publishingMode={}, sequenceNumber={}",
-                    clientTarget,
-                    subscription,
-                    destination,
-                    sentAt,
-                    isSnapshot,
-                    publishingMode,
-                    sequenceNumber);
 
             // Trimming response content
             responseString = responseString.length() > 250

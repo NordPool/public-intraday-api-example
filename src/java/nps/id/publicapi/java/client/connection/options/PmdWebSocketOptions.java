@@ -6,22 +6,22 @@ import org.springframework.stereotype.Component;
 
 @Getter
 @Component
-public class EdgeWebSocketOptions implements WebSocketOptions {
-    @Value("${edge.web.socket.useSsl}")
+public class PmdWebSocketOptions implements WebSocketOptions {
+    @Value("${pmd.web.socket.useSsl}")
     private boolean useSsl;
-    @Value("${edge.web.socket.port}")
+    @Value("${pmd.web.socket.port}")
     private int port;
-    @Value("${edge.web.socket.sslPort}")
+    @Value("${pmd.web.socket.sslPort}")
     private int sslPort;
-    @Value("${edge.web.socket.host}")
+    @Value("${pmd.web.socket.host}")
     private String host;
-    @Value("${edge.web.socket.uri}")
+    @Value("${pmd.web.socket.uri}")
     private String uri;
-    @Value("${edge.heartbeat.outgoing.interval}")
+    @Value("${pmd.heartbeat.outgoing.interval}")
     private int heartbeatOutgoingInterval;
-    @Value("${edge.max.text.message.size}")
+    @Value("${pmd.max.text.message.size}")
     private int maxTextMessageSize;
-    @Value("${edge.max.binary.message.size}")
+    @Value("${pmd.max.binary.message.size}")
     private int maxBinaryMessageSize;
 
     @Override
