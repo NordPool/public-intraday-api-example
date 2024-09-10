@@ -61,7 +61,10 @@ To access [Java Intraday API package](https://maven.pkg.github.com/NordPool/publ
 
 The current program is using the Spring library and its Websocket Stomp client. The usage of it is at your own discretion. 
 
-In [WebSocketConnector.java](/src/main/java/nps/id/publicapi/java/client/connection/WebSocketConnector.java) please note the configuration of maxTextMessageSize and maxByteMessageSize. 
+In addition, sending heartbeat task created after connection established and refreshing access token are  defined in the WebSocketConnector. That connector can be found from [WebSocketConnector.java](src/main/java/nps/id/publicapi/java/client/connection/WebSocketConnector.java).
+Heartbeat interval configuration can be found in [application.properties](src/main/resources/application.properties) **pmd.heartbeat.outgoing.interval** property for PMD and **middleware.heartbeat.outgoing.interval** for Middleware.
+
+In [WebSocketConnector.java](/src/main/java/nps/id/publicapi/java/client/connection/WebSocketConnector.java) please note the configuration of **maxTextMessageSize** and **maxByteMessageSize**. 
 Some messages may be quite large. 
 
 The example uses ports 8083/443(secured) for establishing the web socket connection with **Middleware** web service and ports 80/443(secured) for establishing web socket connection with **PMD** web service. 
