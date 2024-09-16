@@ -53,8 +53,8 @@ public class SubscriptionRequestBuilder {
         return SubscriptionRequest.myTicker(getSubId(), user, version, publishingMode);
     }
 
-    public SubscriptionRequest createPublicStatistics(PublishingMode publishingMode) {
-        return  SubscriptionRequest.publicStatistics(getSubId(), user, version, publishingMode);
+    public SubscriptionRequest createPublicStatistics(PublishingMode publishingMode, int deliveryAreaId) {
+        return  SubscriptionRequest.publicStatistics(getSubId(), user, version, publishingMode, deliveryAreaId);
     }
 
     public SubscriptionRequest createThrottlingLimits(PublishingMode publishingMode) {

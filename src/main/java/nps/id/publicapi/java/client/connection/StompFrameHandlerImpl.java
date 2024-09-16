@@ -78,7 +78,7 @@ public class StompFrameHandlerImpl implements StompFrameHandler {
                 var message = (List<Object>)objectMapper.readValue(decompressedPayload, targetType);
 
                 SimpleCacheStorage.getInstance()
-                        .setCache(clientTarget, typeClass.getName(), message, false);
+                        .setCache(typeClass.getName(), message, false);
 
                 responseString = objectMapper.writeValueAsString(message);
                 logger.info("[{}][Frame({}):ResponseType] : {}", clientTarget, subscription, typeClass);
