@@ -67,16 +67,16 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
             SubscribeContracts(pmdClient, PublishingMode.CONFLATED);
 
             // Local views
-            SubscribeLocalViews(pmdClient, PublishingMode.STREAMING);
+            SubscribeLocalViews(pmdClient, PublishingMode.CONFLATED);
 
             // Private trades
             SubscribePrivateTrades(middlewareClient, PublishingMode.STREAMING);
 
             // Tickers
-            SubscribeTickers(pmdClient, PublishingMode.STREAMING);
+            SubscribeTickers(pmdClient, PublishingMode.CONFLATED);
 
             // MyTickers
-            SubscribeMyTickers(pmdClient, PublishingMode.STREAMING);
+            SubscribeMyTickers(pmdClient, PublishingMode.CONFLATED);
 
             // Public statistics
             SubscribePublicStatistics(pmdClient, PublishingMode.CONFLATED);
@@ -85,7 +85,7 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
             SubscribeThrottlingLimits(middlewareClient, PublishingMode.CONFLATED);
 
             // Capacities
-            SubscribeCapacities(pmdClient, PublishingMode.STREAMING);
+            SubscribeCapacities(pmdClient, PublishingMode.CONFLATED);
 
             // Order
             // We wait some time in hope to get some example contracts and configurations that are needed for preparing example order request
