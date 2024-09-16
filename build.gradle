@@ -42,7 +42,7 @@ project.ext {
     commonsIoVersion = "2.16.1"
     httpClientVersion = "4.5.14"
     auth0JwtVersion = "4.2.1"
-    npsIntradayPublicApi = "1.1.1"
+    npsIntradayPublicApiVersion = "1.1.1"
 }
 
 dependencies {
@@ -75,7 +75,7 @@ dependencies {
     implementation("org.apache.logging.log4j:log4j-api:${project.ext.log4jVersion}")
     implementation("org.apache.httpcomponents:httpclient:${project.ext.httpClientVersion}")
     implementation("com.auth0:java-jwt:${project.ext.auth0JwtVersion}")
-    implementation("com.npspot:public.intraday.api:${project.ext.npsIntradayPublicApi}") {
+    implementation("com.npspot:public.intraday.api:${project.ext.npsIntradayPublicApiVersion}") {
         exclude module: "com.fasterxml.jackson.core"
     }
     annotationProcessor("org.projectlombok:lombok:${project.ext.lombokVersion}")
