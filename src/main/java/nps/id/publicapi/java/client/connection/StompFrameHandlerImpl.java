@@ -9,7 +9,6 @@ import nps.id.publicapi.java.client.connection.enums.WebSocketClientTarget;
 import nps.id.publicapi.java.client.connection.extensions.StompHeadersExtensions;
 import nps.id.publicapi.java.client.connection.storage.SimpleCacheStorage;
 import nps.id.publicapi.java.client.connection.subscriptions.requests.SubscriptionRequest;
-import nps.id.publicapi.java.client.utils.GZipCompressor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.messaging.simp.stomp.StompFrameHandler;
@@ -58,7 +57,7 @@ public class StompFrameHandlerImpl implements StompFrameHandler {
         try {
             var responseString = "";
 
-            logger.info("[{}][Frame({}):Metadata] : destination={}, sentAt={}, snapshot={}, publishingMode={}, sequenceNumber={}",
+            logger.info("[{}][Frame({}):Metadata] destination={}, sentAt={}, snapshot={}, publishingMode={}, sequenceNumber={}",
                     clientTarget,
                     subscription,
                     destination,
@@ -68,23 +67,19 @@ public class StompFrameHandlerImpl implements StompFrameHandler {
                     sequenceNumber);
 
             if (subscriptionRequest.getDataType() != null) {
-                var decompressedPayload = subscriptionRequest.isGzipped()
-                        ? GZipCompressor.decompress(payloadBytes)
-                        : payloadBytes;
-
                 var typeClass = TypeFactory.rawClass(subscriptionRequest.getDataType());
                 var targetType = objectMapper.getTypeFactory()
                         .constructCollectionType(LinkedList.class, typeClass);
-                var message = (List<Object>)objectMapper.readValue(decompressedPayload, targetType);
+                var message = (List<Object>)objectMapper.readValue(payloadBytes, targetType);
 
                 SimpleCacheStorage.getInstance()
                         .setCache(typeClass.getName(), message, false);
 
                 responseString = objectMapper.writeValueAsString(message);
-                logger.info("[{}][Frame({}):ResponseType] : {}", clientTarget, subscription, typeClass);
+                logger.info("[{}][Frame({}):ResponseType] {}", clientTarget, subscription, typeClass);
             } else {
                 responseString = new String(payloadBytes, StandardCharsets.UTF_8);
-                logger.info("[{}][Frame({}):ResponseType] : {}", clientTarget, subscription, String.class.getName());
+                logger.info("[{}][Frame({}):ResponseType] {}", clientTarget, subscription, String.class.getName());
             }
 
             // Trimming response content
@@ -92,10 +87,10 @@ public class StompFrameHandlerImpl implements StompFrameHandler {
                     ? responseString.substring(0, 250) + "..."
                     : responseString;
 
-            logger.info("[{}][Frame({}):Response] : {}", clientTarget, subscription, responseString);
+            logger.info("[{}][Frame({}):Response] {}", clientTarget, subscription, responseString);
         }
         catch (Exception e) {
-            logger.error("[{}][Frame({}):Error] : {}", clientTarget, subscription, e.getMessage());
+            logger.error("[{}][Frame({}):Error] {}", clientTarget, subscription, e.getMessage());
         }
     }
 }

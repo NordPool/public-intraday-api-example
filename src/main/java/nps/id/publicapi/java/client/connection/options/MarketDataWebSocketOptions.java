@@ -6,22 +6,22 @@ import org.springframework.stereotype.Component;
 
 @Getter
 @Component
-public class PmdWebSocketOptions implements WebSocketOptions {
-    @Value("${pmd.web.socket.useSsl}")
+public class MarketDataWebSocketOptions implements WebSocketOptions {
+    @Value("${market.data.web.socket.useSsl}")
     private boolean useSsl;
-    @Value("${pmd.web.socket.port}")
+    @Value("${market.data.web.socket.port}")
     private int port;
-    @Value("${pmd.web.socket.sslPort}")
+    @Value("${market.data.web.socket.sslPort}")
     private int sslPort;
-    @Value("${pmd.web.socket.host}")
+    @Value("${market.data.web.socket.host}")
     private String host;
-    @Value("${pmd.web.socket.uri}")
+    @Value("${market.data.web.socket.uri}")
     private String uri;
-    @Value("${pmd.heartbeat.outgoing.interval}")
+    @Value("${market.data.heartbeat.outgoing.interval}")
     private int heartbeatOutgoingInterval;
-    @Value("${pmd.max.text.message.size}")
+    @Value("${market.data.max.text.message.size}")
     private int maxTextMessageSize;
-    @Value("${pmd.max.binary.message.size}")
+    @Value("${market.data.max.binary.message.size}")
     private int maxBinaryMessageSize;
 
     @Override

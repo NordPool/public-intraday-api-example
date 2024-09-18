@@ -26,6 +26,7 @@ import nps.id.publicapi.java.client.security.options.CredentialsOptions;
 
 import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.concurrent.*;
 
 @Service
 public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
@@ -47,64 +48,66 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
         try {
-            var pmdClient = CreateClient(WebSocketClientTarget.PMD);
-            var middlewareClient = CreateClient(WebSocketClientTarget.MIDDLEWARE);
+            var marketDataClient = CreateClient(WebSocketClientTarget.MARKET_DATA);
+            var tradingClient = CreateClient(WebSocketClientTarget.TRADING);
 
             // Delivery areas
-            subscribeDeliveryAreas(pmdClient);
+            subscribeDeliveryAreas(marketDataClient);
 
             // Configurations
-            subscribeConfigurations(middlewareClient);
+            subscribeConfigurations(tradingClient);
 
             // Order execution report
-            subscribeOrderExecutionReports(middlewareClient, PublishingMode.STREAMING);
+            subscribeOrderExecutionReports(tradingClient, PublishingMode.STREAMING);
 
             // Contracts
-            subscribeContracts(pmdClient, PublishingMode.CONFLATED);
+            subscribeContracts(marketDataClient, PublishingMode.CONFLATED);
 
             // Local views
-            subscribeLocalViews(pmdClient, PublishingMode.CONFLATED);
+            subscribeLocalViews(marketDataClient, PublishingMode.CONFLATED);
 
             // Private trades
-            subscribePrivateTrades(middlewareClient, PublishingMode.STREAMING);
+            subscribePrivateTrades(tradingClient, PublishingMode.STREAMING);
 
             // Tickers
-            subscribeTickers(pmdClient, PublishingMode.CONFLATED);
+            subscribeTickers(marketDataClient, PublishingMode.CONFLATED);
 
             // MyTickers
-            subscribeMyTickers(pmdClient, PublishingMode.CONFLATED);
+            subscribeMyTickers(marketDataClient, PublishingMode.CONFLATED);
 
             // Public statistics
-            subscribePublicStatistics(pmdClient, PublishingMode.CONFLATED);
+            subscribePublicStatistics(marketDataClient, PublishingMode.CONFLATED);
 
             // Throttling limits
-            subscribeThrottlingLimits(middlewareClient, PublishingMode.CONFLATED);
+            subscribeThrottlingLimits(tradingClient, PublishingMode.CONFLATED);
 
             // Capacities
-            subscribeCapacities(pmdClient, PublishingMode.CONFLATED);
+            subscribeCapacities(marketDataClient, PublishingMode.CONFLATED);
 
             // Order
             // We wait some time in hope to get some example contracts and configurations that are needed for preparing example order request
             Thread.sleep(5000);
-            sendOrderRequest(middlewareClient);
+            sendOrderRequest(tradingClient);
             // Wait before order modification request
             Thread.sleep(5000);
-            sendOrderModificationRequest(middlewareClient);
+            sendOrderModificationRequest(tradingClient);
             // Wait before invalid order request
             Thread.sleep(5000);
-            sendInvalidOrderRequest(middlewareClient);
+            sendInvalidOrderRequest(tradingClient);
             // Wait before invalid order modification request
             Thread.sleep(5000);
-            sendInvalidOrderModificationRequest(middlewareClient);
+            sendInvalidOrderModificationRequest(tradingClient);
 
+            Thread.sleep(5000);
             System.out.println("============================================================ ");
             System.out.println("Press 'x' key to unsubscribe, logout and close. . . ");
             System.out.println("============================================================ ");
 
+            // Set clients disconnection behaviour while closing app with 'x' key
             var key = System.in.read();
             if (key == 120) {
-                pmdClient.disconnect();
-                middlewareClient.disconnect();
+                marketDataClient.disconnect();
+                tradingClient.disconnect();
                 System.exit(0);
             }
         } catch (Exception e) {
@@ -164,6 +167,20 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
     private void subscribeThrottlingLimits(StompClient stompClient, PublishingMode publishingMode) throws SubscriptionFailedException {
         var subscription = subscribeRequestBuilder.createThrottlingLimits(publishingMode);
         stompClient.subscribe(subscription);
+
+        // Set automatic unsubscription of throttling limit topic after 10s
+        try (ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor()) {
+            Runnable runnable = () -> {
+                try {
+                    stompClient.unsubscribe(subscription.getSubscriptionId());
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            };
+            executorService.schedule(runnable, 5, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            logger.info("[{}] An error occurred during throttling limits unsubscription, details: {}", stompClient.getClientTarget(), e.getMessage());
+        }
     }
 
     private void subscribeCapacities(StompClient stompClient, PublishingMode publishingMode) throws SubscriptionFailedException {
@@ -204,7 +221,7 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
         SimpleCacheStorage.getInstance()
                 .setCache(OrderEntryRequest.class.getName(), Collections.singletonList(orderRequest), false);
 
-        logger.info("[{}]Attempting to send correct order request.", stompClient.getClientTarget());
+        logger.info("[{}] Attempting to send correct order request.", stompClient.getClientTarget());
         stompClient.send(orderRequest, DestinationHelper.composeDestination(_version, "orderEntryRequest"));
     }
 
@@ -216,7 +233,7 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
                 .stream()
                 .findFirst();
         if (lastOrderEntryRequestOptional.isEmpty()) {
-            logger.warn("[{}]No valid order to be used for order modification has been found in cache!", stompClient.getClientTarget());
+            logger.warn("[{}] No valid order to be used for order modification has been found in cache!", stompClient.getClientTarget());
             return;
         }
 
@@ -232,7 +249,7 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
                 .filter(oer -> oer.getOrders().size() == 1 && Objects.equals(oer.getOrders().getFirst().getClientOrderId(), lastOrderEntry.getClientOrderId()))
                 .findFirst();
         if (lastOrderExecutionReportOptional.isEmpty() || lastOrderExecutionReportOptional.get().getOrders().isEmpty()) {
-            logger.warn("[{}]No valid order execution report to be used for order modification has been found in cache!", stompClient.getClientTarget());
+            logger.warn("[{}] No valid order execution report to be used for order modification has been found in cache!", stompClient.getClientTarget());
             return;
         }
 
@@ -262,7 +279,7 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
                                 .withClipPriceChange(lastOrderEntry.getClipPriceChange())
                 ));
 
-        logger.info("[{}]Attempting to send an correct order modification request.", stompClient.getClientTarget());
+        logger.info("[{}] Attempting to send an correct order modification request.", stompClient.getClientTarget());
         stompClient.send(orderModificationRequest, DestinationHelper.composeDestination(_version, "orderModificationRequest"));
     }
 
@@ -281,7 +298,7 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
                                 .withPortfolioId(portfolioId))
                 );
 
-        logger.info("[{}]Attempting to send incorrect order request.", stompClient.getClientTarget());
+        logger.info("[{}] Attempting to send incorrect order request.", stompClient.getClientTarget());
         stompClient.send(invalidOrderRequest, DestinationHelper.composeDestination(_version, "orderEntryRequest"));
     }
 
@@ -293,7 +310,7 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
                         .withClientOrderId(UUID.randomUUID().toString()))
                 );
 
-        logger.info("[{}]Attempting to send an incorrect order modification request.", stompClient.getClientTarget());
+        logger.info("[{}] Attempting to send an incorrect order modification request.", stompClient.getClientTarget());
         stompClient.send(orderModificationRequest,  DestinationHelper.composeDestination(_version, "orderModificationRequest"));
     }
 
@@ -307,7 +324,7 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
                 .filter(c -> c.getProductType() != ProductType.CUSTOM_BLOCK && c.getDlvryAreaState().stream().anyMatch(s -> s.getState() == ContractState.ACTI))
                 .toList();
         if (exampleContracts.isEmpty()) {
-            logger.warn("[{}]No valid contract to be used for order creation has been found in cache!", stompClient.getClientTarget());
+            logger.warn("[{}] No valid contract to be used for order creation has been found in cache!", stompClient.getClientTarget());
             return null;
         }
 
@@ -335,7 +352,7 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
                 .toList();
 
         if (examplePortfolios.isEmpty()) {
-            logger.warn("[{}]No valid portfolio to be used for order creation has been found in cache!", stompClient.getClientTarget());
+            logger.warn("[{}] No valid portfolio to be used for order creation has been found in cache!", stompClient.getClientTarget());
             return null;
         }
 

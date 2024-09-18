@@ -1,27 +1,27 @@
 package nps.id.publicapi.java.client.connection.clients;
 
 import nps.id.publicapi.java.client.connection.enums.WebSocketClientTarget;
-import nps.id.publicapi.java.client.connection.options.PmdWebSocketOptions;
-import nps.id.publicapi.java.client.connection.options.MiddlewareWebSocketOptions;
+import nps.id.publicapi.java.client.connection.options.MarketDataWebSocketOptions;
+import nps.id.publicapi.java.client.connection.options.TradingWebSocketOptions;
 import org.springframework.stereotype.Service;
 
 @Service
 public class StompClientGenericFactory {
-    private final MiddlewareWebSocketOptions middlewareWebSocketOptions;
-    private final PmdWebSocketOptions pmdWebSocketOptions;
+    private final TradingWebSocketOptions tradingWebSocketOptions;
+    private final MarketDataWebSocketOptions webSocketOptions;
 
     private final StompClientFactory stompClientFactory;
 
-    public StompClientGenericFactory(StompClientFactory stompClientFactory, MiddlewareWebSocketOptions middlewareWebSocketOptions, PmdWebSocketOptions pmdWebSocketOptions) {
+    public StompClientGenericFactory(StompClientFactory stompClientFactory, TradingWebSocketOptions tradingWebSocketOptions, MarketDataWebSocketOptions webSocketOptions) {
         this.stompClientFactory = stompClientFactory;
-        this.middlewareWebSocketOptions = middlewareWebSocketOptions;
-        this.pmdWebSocketOptions = pmdWebSocketOptions;
+        this.tradingWebSocketOptions = tradingWebSocketOptions;
+        this.webSocketOptions = webSocketOptions;
     }
 
     public StompClient create(String clientId, WebSocketClientTarget target) {
         var client =  switch (target) {
-            case MIDDLEWARE -> stompClientFactory.create(WebSocketClientTarget.MIDDLEWARE, clientId, middlewareWebSocketOptions);
-            case PMD -> stompClientFactory.create(WebSocketClientTarget.PMD, clientId, pmdWebSocketOptions);
+            case TRADING -> stompClientFactory.create(WebSocketClientTarget.TRADING, clientId, tradingWebSocketOptions);
+            case MARKET_DATA -> stompClientFactory.create(WebSocketClientTarget.MARKET_DATA, clientId, webSocketOptions);
             default -> throw new UnsupportedOperationException();
         };
 

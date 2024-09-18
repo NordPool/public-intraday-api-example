@@ -56,16 +56,19 @@ public class WebSocketConnector {
         this.ssoService = ssoService;
         this.webSocketOptions = webSocketOptions;
 
+        var sockJsClient = createSockJsClient(webSocketOptions);
+        webSocketStompClient = new WebSocketStompClient(sockJsClient);
+        webSocketStompClient.setMessageConverter(new SimpleMessageConverter());
+        webSocketStompClient.setInboundMessageSizeLimit(webSocketOptions.getMaxTextMessageSize());
+        webSocketStompClient.setDefaultHeartbeat(new long[]{webSocketOptions.getHeartbeatOutgoingInterval(), 0L});
+    }
+
+    private static SockJsClient createSockJsClient(WebSocketOptions webSocketOptions) {
         var webSocketContainer = (JakartaWebSocketClientContainer) ContainerProvider.getWebSocketContainer();
         webSocketContainer.setDefaultMaxSessionIdleTimeout(100000);
         webSocketContainer.setDefaultMaxTextMessageBufferSize(webSocketOptions.getMaxTextMessageSize());
         webSocketContainer.setDefaultMaxBinaryMessageBufferSize(webSocketOptions.getMaxBinaryMessageSize());
-        var sockJsClient = new SockJsClient(Collections.singletonList(new WebSocketTransport(new StandardWebSocketClient(webSocketContainer))));
-        webSocketStompClient = new WebSocketStompClient(sockJsClient);
-
-        webSocketStompClient.setMessageConverter(new SimpleMessageConverter());
-        webSocketStompClient.setInboundMessageSizeLimit(webSocketOptions.getMaxTextMessageSize());
-        webSocketStompClient.setDefaultHeartbeat(new long[]{webSocketOptions.getHeartbeatOutgoingInterval(), 0L});
+        return new SockJsClient(Collections.singletonList(new WebSocketTransport(new StandardWebSocketClient(webSocketContainer))));
     }
 
     public void connect() {
@@ -103,7 +106,7 @@ public class WebSocketConnector {
             var payloadBytes = objectMapper.writeValueAsBytes(payload);
             stompSession.send(stompHeaders, payloadBytes);
         } catch (Exception e) {
-            logger.error("[SESSION:{}] : An error occurred during sending payload, details: {}", stompSession.getSessionId(), e.getMessage());
+            logger.error("[SESSION:{}] An error occurred during sending payload, details: {}", stompSession.getSessionId(), e.getMessage());
         }
     }
 
@@ -114,7 +117,7 @@ public class WebSocketConnector {
             var logoutCommandPayload = objectMapper.writeValueAsBytes(logoutCommand);
             stompSession.send(logoutHeaders, logoutCommandPayload);
         } catch (Exception e) {
-            logger.error("[SESSION:{}] : An error occurred during logout command, details: {}", stompSession.getSessionId(), e.getMessage());
+            logger.error("[SESSION:{}] An error occurred during logout command, details: {}", stompSession.getSessionId(), e.getMessage());
         }
     }
 

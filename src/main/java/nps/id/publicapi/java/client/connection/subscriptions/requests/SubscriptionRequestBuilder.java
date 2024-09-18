@@ -69,14 +69,6 @@ public class SubscriptionRequestBuilder {
         return SubscriptionRequest.capacities(getSubId(), user, version, publishingMode, deliveryAreaId, additionalDeliveryAreas);
     }
 
-    public SubscriptionRequest createMarketInfo(PublishingMode publishingMode, int deliveryAreaId) {
-        return SubscriptionRequest.marketInfo(getSubId(), user, version, publishingMode, deliveryAreaId);
-    }
-
-    public SubscriptionRequest createHeartBeat() {
-        return SubscriptionRequest.heartbeat(getSubId(), user, version);
-    }
-
     private String getSubId() {
         return "sub-" + atomicInteger.incrementAndGet();
     }

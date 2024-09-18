@@ -25,14 +25,6 @@ public class StompHeadersExtensions {
         return stompHeaders.getFirst(Headers.Server.SequenceNumber);
     }
 
-    public static String getDestination(StompHeaders stompHeaders) {
-        return stompHeaders.getFirst(Headers.Destination);
-    }
-
-    public static String getSubscription(StompHeaders stompHeaders) {
-        return stompHeaders.getFirst(Headers.Server.Subscription);
-    }
-
     public static LocalDateTime getSentAt(StompHeaders stompHeaders) {
         var value = stompHeaders.getFirst(Headers.Server.SentAt);
         return LocalDateTime.ofInstant(Instant.ofEpochMilli(Long.parseLong(value)), ZoneId.of("UTC"));

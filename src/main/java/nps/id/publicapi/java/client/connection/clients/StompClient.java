@@ -44,7 +44,7 @@ public class StompClient {
 
     public StompSession.Subscription subscribe(SubscriptionRequest request) throws SubscriptionFailedException {
         if (!webSocketConnector.isConnected()) {
-            throw new SubscriptionFailedException("["+ clientTarget + "][Destination:" + request.getDestination() + "]Failed to subscribe because no connection is established! Connect first!");
+            throw new SubscriptionFailedException("["+ clientTarget + "][Destination:" + request.getDestination() + "] Failed to subscribe because no connection is established! Connect first!");
         }
 
         var session = webSocketConnector.getStompSession();
@@ -82,6 +82,6 @@ public class StompClient {
 
         unsubscribeAll();
 
-        logger.info("[{}][ClientId:{}]Connection closed", clientTarget, clientId);
+        logger.info("[{}][ClientId:{}] Connection closed", clientTarget, clientId);
     }
 }
