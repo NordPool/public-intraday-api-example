@@ -40,7 +40,6 @@ public class WebSocketConnector {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private static final String SecureWebSocketProtocol = "wss";
-    private static final String UnsecureWebSocketProtocol = "ws";
 
     private final TaskScheduler heartBeatScheduler;
     private final SsoService ssoService;
@@ -92,11 +91,9 @@ public class WebSocketConnector {
     }
 
     private URI constructBaseUri() throws URISyntaxException {
-        var webSocketProtocol = webSocketOptions.isUseSsl() ? SecureWebSocketProtocol : UnsecureWebSocketProtocol;
-        var webSocketPort = webSocketOptions.getUsedPort();
-        var constructedUri = webSocketProtocol + "://"
+        var constructedUri = SecureWebSocketProtocol + "://"
                 + webSocketOptions.getHost() + ":"
-                + webSocketPort
+                + webSocketOptions.getSslPort()
                 + webSocketOptions.getUri();
         return new URI(constructedUri);
     }

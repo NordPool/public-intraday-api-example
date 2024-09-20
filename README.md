@@ -31,7 +31,7 @@ These credentials shall be obtained from [idapi@nordpoolgroup.com](mailto:idapi@
 Additionally, make sure that all the other variables in the [application.properties](/src/main/resources/application.properties) file point to correct addresses.
 Finally, run the solution with **gradle run** command or by run a startup class [ApplicationMain.java](/src/main/java/nps/id/publicapi/java/client/ApplicationMain.java) with your Java IDE.
 
-The program will create two parallel connections that targets both: **Market data** web service and old **Trading** web service.
+The program will create two parallel connections that targets both: **Market data** web service and **Trading** web service.
 Each connection subscribes to several example topics. It also provides an example of sending messages to Intraday platform.
 
 Every communication step, its results or exceptions are printed in console output window.~~~~
@@ -67,19 +67,9 @@ Heartbeat interval configuration can be found in [application.properties](src/ma
 In [WebSocketConnector.java](/src/main/java/nps/id/publicapi/java/client/connection/WebSocketConnector.java) please note the configuration of **maxTextMessageSize** and **maxByteMessageSize**. 
 Some messages may be quite large. 
 
-The example uses ports 8083/443(secured) for establishing the web socket connection with **Trading** web service and ports 80/443(secured) for establishing web socket connection with **Market data** web service. 
+The example uses port 443(secured) for establishing the web socket connection with **Trading** and **Market data** web services. 
 If the example doesn't connect to the API, check that the above ports has been opened from your firewall.
 
 ## Questions, comments and error reporting ##
 
 Please send questions and bug reports to [idapi@nordpoolgroup.com](mailto:idapi@nordpoolgroup.com).
-
-## SSL configuration: 
-
-Change useSsl property value from false to true.
-```
-#!
-market.data.web.socket.useSsl=true
-
-trading.web.socket.useSsl=true
-```

@@ -7,10 +7,6 @@ import org.springframework.stereotype.Component;
 @Getter
 @Component
 public class MarketDataWebSocketOptions implements WebSocketOptions {
-    @Value("${market.data.web.socket.useSsl}")
-    private boolean useSsl;
-    @Value("${market.data.web.socket.port}")
-    private int port;
     @Value("${market.data.web.socket.sslPort}")
     private int sslPort;
     @Value("${market.data.web.socket.host}")
@@ -23,9 +19,4 @@ public class MarketDataWebSocketOptions implements WebSocketOptions {
     private int maxTextMessageSize;
     @Value("${market.data.max.binary.message.size}")
     private int maxBinaryMessageSize;
-
-    @Override
-    public int getUsedPort() {
-        return this.isUseSsl() ? this.getSslPort() : this.getPort();
-    }
 }
