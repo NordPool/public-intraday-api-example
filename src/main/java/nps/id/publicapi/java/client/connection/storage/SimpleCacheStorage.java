@@ -4,34 +4,18 @@ import java.util.*;
 
 public class SimpleCacheStorage {
 
-    private static volatile SimpleCacheStorage instance;
-    private static final Object mutex = new Object();
 
-    private final Dictionary<String, List<Object>> _data = new Hashtable<>();
+    private final HashMap<String, List<Object>> data = new HashMap<>();
 
-    private SimpleCacheStorage() {}
-
-    public static SimpleCacheStorage getInstance() {
-        var result = instance;
-
-        if (result == null) {
-            synchronized (mutex) {
-                result = instance;
-                if (result == null)
-                    instance = result = new SimpleCacheStorage();
-            }
-        }
-
-        return result;
-    }
+    public SimpleCacheStorage() {}
 
     public <T> void setCache(String dataType, List<T> data, boolean overrideValues) {
-        var dataByType = _data.get(dataType);
+        var dataByType = this.data.get(dataType);
         if (dataByType == null) {
-            _data.put(dataType, new ArrayList<>());
+            this.data.put(dataType, new ArrayList<>());
         }
 
-        var entry = _data.get(dataType);
+        var entry = this.data.get(dataType);
         if (overrideValues) {
             entry.clear();
         }
@@ -39,7 +23,7 @@ public class SimpleCacheStorage {
     }
 
     public <T> List<T> getFromCache(String dataType) {
-        var dataByType = _data.get(dataType);
+        var dataByType = data.get(dataType);
         if (dataByType == null) {
             return Collections.emptyList();
         }

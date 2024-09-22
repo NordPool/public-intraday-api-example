@@ -2,12 +2,13 @@ package nps.id.publicapi.java.client.connection.subscriptions.requests;
 
 import nps.id.publicapi.java.client.connection.enums.PublishingMode;
 
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class SubscriptionRequestBuilder {
 
-    private final static AtomicInteger atomicInteger = new AtomicInteger();
+    private static final AtomicInteger ATOMIC_INTEGER = new AtomicInteger();
 
     private final String user;
     private final String version;
@@ -62,14 +63,14 @@ public class SubscriptionRequestBuilder {
     }
 
     public SubscriptionRequest createCapacities(PublishingMode publishingMode, int deliveryAreaId) {
-        return createCapacities(publishingMode, deliveryAreaId, new ArrayList<>());
+        return createCapacities(publishingMode, deliveryAreaId, Collections.emptyList());
     }
 
-    public SubscriptionRequest createCapacities(PublishingMode publishingMode, int deliveryAreaId, ArrayList<Integer> additionalDeliveryAreas) {
+    public SubscriptionRequest createCapacities(PublishingMode publishingMode, int deliveryAreaId, List<Integer> additionalDeliveryAreas) {
         return SubscriptionRequest.capacities(getSubId(), user, version, publishingMode, deliveryAreaId, additionalDeliveryAreas);
     }
 
     private String getSubId() {
-        return "sub-" + atomicInteger.incrementAndGet();
+        return "sub-" + ATOMIC_INTEGER.incrementAndGet();
     }
 }

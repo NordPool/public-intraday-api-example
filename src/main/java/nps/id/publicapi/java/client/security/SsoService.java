@@ -1,5 +1,6 @@
 package nps.id.publicapi.java.client.security;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import nps.id.publicapi.java.client.connection.messages.Headers;
 import lombok.Getter;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import nps.id.publicapi.java.client.security.options.SsoOptions;
 import nps.id.publicapi.java.client.security.responses.AccessTokenResponse;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
@@ -32,12 +34,12 @@ public class SsoService {
     @Getter
     private String currentAuthToken = null;
 
-    public SsoService(SsoOptions ssoOptions, CredentialsOptions credentialsOptions)
+    public SsoService(HttpClient httpClient, ObjectMapper objectMapper, SsoOptions ssoOptions, CredentialsOptions credentialsOptions)
     {
+        this.httpClient = httpClient;
+        this.objectMapper = objectMapper;
         this.ssoOptions = ssoOptions;
         this.credentialsOptions = credentialsOptions;
-        httpClient = HttpClient.newHttpClient();
-        objectMapper = new ObjectMapper();
         grantType = "password";
         scope = "global";
     }
@@ -55,16 +57,17 @@ public class SsoService {
             var httpRequest = HttpRequest.newBuilder()
                     .POST(HttpRequest.BodyPublishers.ofString(payload))
                     .uri(uri)
-                    .setHeader(Headers.ContentType, "application/x-www-form-urlencoded")
-                    .setHeader(Headers.Authorization, "Basic " + new String(encodedAuth))
+                    .setHeader(Headers.CONTENT_TYPE, "application/x-www-form-urlencoded")
+                    .setHeader(Headers.AUTHORIZATION, "Basic " + new String(encodedAuth))
                     .build();
 
             var response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-            currentAuthToken = objectMapper.readValue(response.body(), AccessTokenResponse.class).AccessToken;
+            currentAuthToken = objectMapper.readValue(response.body(), AccessTokenResponse.class).accessToken;
             return currentAuthToken;
+        } catch (JsonProcessingException e) {
+            throw new TokenRequestFailedException("Failed to read auth token response body!", e);
         }
-        catch (Exception e)
-        {
+        catch(InterruptedException | IOException e) {
             throw new TokenRequestFailedException("Failed to retrieve auth token! Check username and password!", e);
         }
     }

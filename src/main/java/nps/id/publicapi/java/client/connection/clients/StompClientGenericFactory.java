@@ -18,10 +18,10 @@ public class StompClientGenericFactory {
         this.webSocketOptions = webSocketOptions;
     }
 
-    public StompClient create(String clientId, WebSocketClientTarget target) {
+    public StompClient create(WebSocketClientTarget target) {
         var client =  switch (target) {
-            case TRADING -> stompClientFactory.create(WebSocketClientTarget.TRADING, clientId, tradingWebSocketOptions);
-            case MARKET_DATA -> stompClientFactory.create(WebSocketClientTarget.MARKET_DATA, clientId, webSocketOptions);
+            case TRADING -> stompClientFactory.create(WebSocketClientTarget.TRADING, tradingWebSocketOptions);
+            case MARKET_DATA -> stompClientFactory.create(WebSocketClientTarget.MARKET_DATA, webSocketOptions);
             default -> throw new UnsupportedOperationException();
         };
 

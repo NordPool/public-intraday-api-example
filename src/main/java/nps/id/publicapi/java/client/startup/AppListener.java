@@ -19,37 +19,40 @@ import nps.id.publicapi.java.client.connection.subscriptions.requests.Subscripti
 import org.apache.commons.lang3.tuple.Triple;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.awaitility.Awaitility;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Service;
 import nps.id.publicapi.java.client.security.options.CredentialsOptions;
 
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.concurrent.*;
 
 @Service
 public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
-    private static final Logger logger = LogManager.getLogger(AppListener.class);
+    private static final Logger LOGGER = LogManager.getLogger(AppListener.class);
 
-    private final String _version = "v1";
-    private final int _demoArea = 2;
-    private final String _clientId = UUID.randomUUID() + "-java-demo-client";
+    private static final String VERSION = "v1";
+    private static final int DEMO_AREA = 2;
 
+    private final SimpleCacheStorage simpleCacheStorage;
     private final StompClientGenericFactory stompClientGenericFactory;
 
     private final SubscriptionRequestBuilder subscribeRequestBuilder;
 
-    public AppListener(CredentialsOptions credentialsOptions, StompClientGenericFactory stompClientGenericFactory) {
+    public AppListener(SimpleCacheStorage simpleCacheStorage, CredentialsOptions credentialsOptions, StompClientGenericFactory stompClientGenericFactory) {
+        this.simpleCacheStorage = simpleCacheStorage;
         this.stompClientGenericFactory = stompClientGenericFactory;
-        this.subscribeRequestBuilder = SubscriptionRequestBuilder.createBuilder(credentialsOptions.getUserName(), _version);
+        this.subscribeRequestBuilder = SubscriptionRequestBuilder.createBuilder(credentialsOptions.getUserName(), VERSION);
     }
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
         try {
-            var marketDataClient = CreateClient(WebSocketClientTarget.MARKET_DATA);
-            var tradingClient = CreateClient(WebSocketClientTarget.TRADING);
+            var marketDataClient = createClient(WebSocketClientTarget.MARKET_DATA);
+            var tradingClient = createClient(WebSocketClientTarget.TRADING);
 
             // Delivery areas
             subscribeDeliveryAreas(marketDataClient);
@@ -86,19 +89,20 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
 
             // Order
             // We wait some time in hope to get some example contracts and configurations that are needed for preparing example order request
-            Thread.sleep(5000);
+
+            waitMillis(5000);
             sendOrderRequest(tradingClient);
             // Wait before order modification request
-            Thread.sleep(5000);
+            waitMillis(5000);
             sendOrderModificationRequest(tradingClient);
             // Wait before invalid order request
-            Thread.sleep(5000);
+            waitMillis(3000);
             sendInvalidOrderRequest(tradingClient);
             // Wait before invalid order modification request
-            Thread.sleep(5000);
+            waitMillis(3000);
             sendInvalidOrderModificationRequest(tradingClient);
 
-            Thread.sleep(5000);
+            waitMillis(3000);
             System.out.println("============================================================ ");
             System.out.println("Press 'x' key to unsubscribe, logout and close. . . ");
             System.out.println("============================================================ ");
@@ -115,8 +119,15 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
         }
     }
 
-    private StompClient CreateClient(WebSocketClientTarget clientTarget) {
-        return stompClientGenericFactory.create(_clientId, clientTarget);
+    private void waitMillis(long milliseconds) {
+        Awaitility
+                .await()
+                .pollDelay(Duration.ofMillis(milliseconds))
+                .until(() -> true);
+    }
+
+    private StompClient createClient(WebSocketClientTarget clientTarget) {
+        return stompClientGenericFactory.create(clientTarget);
     }
 
     private void subscribeDeliveryAreas(StompClient stompClient) throws SubscriptionFailedException {
@@ -140,7 +151,7 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
     }
 
     private void subscribeLocalViews(StompClient stompClient, PublishingMode publishingMode) throws SubscriptionFailedException {
-        var subscription = subscribeRequestBuilder.createLocalView(publishingMode, _demoArea);
+        var subscription = subscribeRequestBuilder.createLocalView(publishingMode, DEMO_AREA);
         stompClient.subscribe(subscription);
     }
 
@@ -160,7 +171,7 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
     }
 
     private void subscribePublicStatistics(StompClient stompClient, PublishingMode publishingMode) throws SubscriptionFailedException {
-        var subscription = subscribeRequestBuilder.createPublicStatistics(publishingMode, _demoArea);
+        var subscription = subscribeRequestBuilder.createPublicStatistics(publishingMode, DEMO_AREA);
         stompClient.subscribe(subscription);
     }
 
@@ -179,12 +190,12 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
             };
             executorService.schedule(runnable, 5, TimeUnit.SECONDS);
         } catch (Exception e) {
-            logger.info("[{}] An error occurred during throttling limits unsubscription, details: {}", stompClient.getClientTarget(), e.getMessage());
+            LOGGER.info("[{}] An error occurred during throttling limits unsubscription, details: {}", stompClient.getClientTarget(), e.getMessage());
         }
     }
 
     private void subscribeCapacities(StompClient stompClient, PublishingMode publishingMode) throws SubscriptionFailedException {
-        var subscription = subscribeRequestBuilder.createCapacities(publishingMode, _demoArea);
+        var subscription = subscribeRequestBuilder.createCapacities(publishingMode, DEMO_AREA);
         stompClient.subscribe(subscription);
     }
 
@@ -218,22 +229,22 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
                 ));
 
         // Store created order in simple cache storage for order modification request
-        SimpleCacheStorage.getInstance()
+        simpleCacheStorage
                 .setCache(OrderEntryRequest.class.getName(), Collections.singletonList(orderRequest), false);
 
-        logger.info("[{}] Attempting to send correct order request.", stompClient.getClientTarget());
-        stompClient.send(orderRequest, DestinationHelper.composeDestination(_version, "orderEntryRequest"));
+        LOGGER.info("[{}] Attempting to send correct order request.", stompClient.getClientTarget());
+        stompClient.send(orderRequest, DestinationHelper.composeDestination(VERSION, "orderEntryRequest"));
     }
 
     private void sendOrderModificationRequest(StompClient stompClient) {
         // Get last created order for update purpose
-        var lastOrderEntryRequestOptional = SimpleCacheStorage.getInstance()
+        var lastOrderEntryRequestOptional = simpleCacheStorage
                 .getFromCache(OrderEntryRequest.class.getName())
                 .reversed()
                 .stream()
                 .findFirst();
         if (lastOrderEntryRequestOptional.isEmpty()) {
-            logger.warn("[{}] No valid order to be used for order modification has been found in cache!", stompClient.getClientTarget());
+            LOGGER.warn("[{}] No valid order to be used for order modification has been found in cache!", stompClient.getClientTarget());
             return;
         }
 
@@ -241,7 +252,7 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
         var lastOrderEntry = lastOrderEntryRequest.getOrders().getFirst();
 
         // Get last order execution report response for above order request (OrderId required for order modification request)
-        var lastOrderExecutionReportOptional = SimpleCacheStorage.getInstance()
+        var lastOrderExecutionReportOptional = simpleCacheStorage
                 .getFromCache(OrderExecutionReport.class.getName())
                 .reversed()
                 .stream()
@@ -249,7 +260,7 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
                 .filter(oer -> oer.getOrders().size() == 1 && Objects.equals(oer.getOrders().getFirst().getClientOrderId(), lastOrderEntry.getClientOrderId()))
                 .findFirst();
         if (lastOrderExecutionReportOptional.isEmpty() || lastOrderExecutionReportOptional.get().getOrders().isEmpty()) {
-            logger.warn("[{}] No valid order execution report to be used for order modification has been found in cache!", stompClient.getClientTarget());
+            LOGGER.warn("[{}] No valid order execution report to be used for order modification has been found in cache!", stompClient.getClientTarget());
             return;
         }
 
@@ -279,8 +290,8 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
                                 .withClipPriceChange(lastOrderEntry.getClipPriceChange())
                 ));
 
-        logger.info("[{}] Attempting to send an correct order modification request.", stompClient.getClientTarget());
-        stompClient.send(orderModificationRequest, DestinationHelper.composeDestination(_version, "orderModificationRequest"));
+        LOGGER.info("[{}] Attempting to send an correct order modification request.", stompClient.getClientTarget());
+        stompClient.send(orderModificationRequest, DestinationHelper.composeDestination(VERSION, "orderModificationRequest"));
     }
 
     private void sendInvalidOrderRequest(StompClient stompClient) {
@@ -298,8 +309,8 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
                                 .withPortfolioId(portfolioId))
                 );
 
-        logger.info("[{}] Attempting to send incorrect order request.", stompClient.getClientTarget());
-        stompClient.send(invalidOrderRequest, DestinationHelper.composeDestination(_version, "orderEntryRequest"));
+        LOGGER.info("[{}] Attempting to send incorrect order request.", stompClient.getClientTarget());
+        stompClient.send(invalidOrderRequest, DestinationHelper.composeDestination(VERSION, "orderEntryRequest"));
     }
 
     private void sendInvalidOrderModificationRequest(StompClient stompClient) {
@@ -310,21 +321,21 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
                         .withClientOrderId(UUID.randomUUID().toString()))
                 );
 
-        logger.info("[{}] Attempting to send an incorrect order modification request.", stompClient.getClientTarget());
-        stompClient.send(orderModificationRequest,  DestinationHelper.composeDestination(_version, "orderModificationRequest"));
+        LOGGER.info("[{}] Attempting to send an incorrect order modification request.", stompClient.getClientTarget());
+        stompClient.send(orderModificationRequest,  DestinationHelper.composeDestination(VERSION, "orderModificationRequest"));
     }
 
     private Triple<String, String, Long> getExampleContractPortfolioAndArea(StompClient stompClient) {
         var random = new Random();
 
-        var exampleContracts = SimpleCacheStorage.getInstance()
+        var exampleContracts = simpleCacheStorage
                 .getFromCache(ContractRow.class.getName())
                 .stream()
                 .map(c -> (ContractRow)c)
                 .filter(c -> c.getProductType() != ProductType.CUSTOM_BLOCK && c.getDlvryAreaState().stream().anyMatch(s -> s.getState() == ContractState.ACTI))
                 .toList();
         if (exampleContracts.isEmpty()) {
-            logger.warn("[{}] No valid contract to be used for order creation has been found in cache!", stompClient.getClientTarget());
+            LOGGER.warn("[{}] No valid contract to be used for order creation has been found in cache!", stompClient.getClientTarget());
             return null;
         }
 
@@ -336,7 +347,7 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
                 .filter(s -> s.getState() == ContractState.ACTI)
                 .toList();
 
-        var examplePortfolios = SimpleCacheStorage.getInstance()
+        var examplePortfolios = simpleCacheStorage
                 .getFromCache(ConfigurationRow.class.getName())
                 .stream()
                 .map(c -> ((ConfigurationRow)c).getPortfolios())
@@ -352,7 +363,7 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
                 .toList();
 
         if (examplePortfolios.isEmpty()) {
-            logger.warn("[{}] No valid portfolio to be used for order creation has been found in cache!", stompClient.getClientTarget());
+            LOGGER.warn("[{}] No valid portfolio to be used for order creation has been found in cache!", stompClient.getClientTarget());
             return null;
         }
 

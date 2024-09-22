@@ -1,10 +1,12 @@
 package nps.id.publicapi.java.client.connection.clients;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import nps.id.publicapi.java.client.connection.StompFrameHandlerImpl;
 import nps.id.publicapi.java.client.connection.WebSocketConnector;
 import nps.id.publicapi.java.client.connection.enums.WebSocketClientTarget;
 import nps.id.publicapi.java.client.connection.messages.StompMessageFactory;
+import nps.id.publicapi.java.client.connection.storage.SimpleCacheStorage;
 import nps.id.publicapi.java.client.connection.subscriptions.exceptions.SubscriptionFailedException;
 import nps.id.publicapi.java.client.connection.subscriptions.requests.SubscriptionRequest;
 import org.apache.logging.log4j.LogManager;
@@ -15,17 +17,21 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class StompClient {
-    private static final Logger logger = LogManager.getLogger(StompClient.class);
+    private static final Logger LOGGER = LogManager.getLogger(StompClient.class);
 
     private final Map<String, StompSession.Subscription> subscriptions = new HashMap<>();
 
+    private final SimpleCacheStorage simpleCacheStorage;
+    private final ObjectMapper objectMapper;
     private final WebSocketConnector webSocketConnector;
 
     @Getter
     private final WebSocketClientTarget clientTarget;
     private final String clientId;
 
-    public StompClient(WebSocketConnector webSocketConnector, WebSocketClientTarget clientTarget, String clientId) {
+    public StompClient(SimpleCacheStorage simpleCacheStorage, ObjectMapper objectMapper, WebSocketConnector webSocketConnector, WebSocketClientTarget clientTarget, String clientId) {
+        this.simpleCacheStorage = simpleCacheStorage;
+        this.objectMapper = objectMapper;
         this.webSocketConnector = webSocketConnector;
         this.clientTarget = clientTarget;
         this.clientId = clientId;
@@ -35,7 +41,7 @@ public class StompClient {
         webSocketConnector.connect();
         var session = webSocketConnector.getStompSession();
         if (session != null && session.isConnected()) {
-            logger.info("[{}][ClientId:{}][SESSION:{}] Connection established", clientTarget, session.getSessionId(), clientId);
+            LOGGER.info("[{}][ClientId:{}][SESSION:{}] Connection established", clientTarget, clientId, session.getSessionId());
             return true;
         }
 
@@ -49,9 +55,9 @@ public class StompClient {
 
         var session = webSocketConnector.getStompSession();
         var subscribeHeaders = StompMessageFactory.subscribeHeaders(request.getDestination(), request.getSubscriptionId());
-        var subscription = session.subscribe(subscribeHeaders, new StompFrameHandlerImpl(clientTarget, request));
+        var subscription = session.subscribe(subscribeHeaders, new StompFrameHandlerImpl(simpleCacheStorage, objectMapper, clientTarget, request));
         subscriptions.put(request.getSubscriptionId(), subscription);
-        logger.info("[{}][SubscriptionId:{}] Subscription created", clientTarget, subscription.getSubscriptionId());
+        LOGGER.info("[{}][SubscriptionId:{}] Subscription created", clientTarget, subscription.getSubscriptionId());
         return subscription;
     }
 
@@ -64,7 +70,7 @@ public class StompClient {
         var subscription = subscriptions.get(subscriptionId);
         subscription.unsubscribe();
         subscriptions.remove(subscriptionId);
-        logger.info("[{}][SubscriptionId:{}] Unsubscribed", clientTarget, subscriptionId);
+        LOGGER.info("[{}][SubscriptionId:{}] Unsubscribed", clientTarget, subscriptionId);
     }
 
     private void unsubscribeAll() {
@@ -82,6 +88,6 @@ public class StompClient {
 
         unsubscribeAll();
 
-        logger.info("[{}][ClientId:{}] Connection closed", clientTarget, clientId);
+        LOGGER.info("[{}][ClientId:{}] Connection closed", clientTarget, clientId);
     }
 }

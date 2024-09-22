@@ -35,11 +35,11 @@ import java.util.concurrent.TimeUnit;
 
 
 public class WebSocketConnector {
-    private static final Logger logger = LogManager.getLogger(WebSocketConnector.class);
+    private static final Logger LOGGER = LogManager.getLogger(WebSocketConnector.class);
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private static final String SecureWebSocketProtocol = "wss";
+    private static final String SECURE_WEB_SOCKET_PROTOCOL = "wss";
 
     private final TaskScheduler heartBeatScheduler;
     private final SsoService ssoService;
@@ -82,7 +82,7 @@ public class WebSocketConnector {
             var completableFuture = webSocketStompClient.connectAsync(uri, null, connectionHeaders, new StompSessionHandlerAdapterImpl());
             stompSession = completableFuture.get(10, TimeUnit.SECONDS);
         } catch (Exception e) {
-            logger.error(e);
+            LOGGER.error(e);
         }
     }
 
@@ -91,7 +91,7 @@ public class WebSocketConnector {
     }
 
     private URI constructBaseUri() throws URISyntaxException {
-        var constructedUri = SecureWebSocketProtocol + "://"
+        var constructedUri = SECURE_WEB_SOCKET_PROTOCOL + "://"
                 + webSocketOptions.getHost() + ":"
                 + webSocketOptions.getSslPort()
                 + webSocketOptions.getUri();
@@ -103,7 +103,7 @@ public class WebSocketConnector {
             var payloadBytes = objectMapper.writeValueAsBytes(payload);
             stompSession.send(stompHeaders, payloadBytes);
         } catch (Exception e) {
-            logger.error("[SESSION:{}] An error occurred during sending payload, details: {}", stompSession.getSessionId(), e.getMessage());
+            LOGGER.error("[SESSION:{}] An error occurred during sending payload, details: {}", stompSession.getSessionId(), e.getMessage());
         }
     }
 
@@ -114,7 +114,7 @@ public class WebSocketConnector {
             var logoutCommandPayload = objectMapper.writeValueAsBytes(logoutCommand);
             stompSession.send(logoutHeaders, logoutCommandPayload);
         } catch (Exception e) {
-            logger.error("[SESSION:{}] An error occurred during logout command, details: {}", stompSession.getSessionId(), e.getMessage());
+            LOGGER.error("[SESSION:{}] An error occurred during logout command, details: {}", stompSession.getSessionId(), e.getMessage());
         }
     }
 
@@ -122,33 +122,13 @@ public class WebSocketConnector {
         stompSession.disconnect();
     }
 
-    private void periodicallyRefreshToken() throws Exception {
-        while (stompSession.isConnected()) {
-            var currentAuthToken = ssoService.getCurrentAuthToken();
-            var jwt = JWT.decode(currentAuthToken);
-            var expirationDate = jwt.getExpiresAt();
-            var refreshPeriod = DateUtils.addMinutes(expirationDate, -5);
-            var duration = Duration.ofMillis(refreshPeriod.getTime() - new Date().getTime());
-            TimeUnit.SECONDS.sleep(duration.getSeconds());
 
-            refreshAccessToken();
-        }
-    }
-
-    private void refreshAccessToken() throws Exception {
-        var previousAuthToken = ssoService.getCurrentAuthToken();
-        var currentAuthToken = ssoService.getAuthToken();
-        var refreshTokenCommand = new TokenRefreshCommand(previousAuthToken, currentAuthToken, CommandType.TOKEN_REFRESH);
-        var refreshTokenCommandPayload = objectMapper.writeValueAsBytes(refreshTokenCommand);
-        var refreshTokenHeaders = StompMessageFactory.sendHeaders("/v1/command");
-        stompSession.send(refreshTokenHeaders, refreshTokenCommandPayload);
-    }
 
     private final class StompSessionHandlerAdapterImpl extends StompSessionHandlerAdapter {
 
         @Override
         public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
-            logger.info("[SESSION:{}] Connected successfully", session.getSessionId());
+            LOGGER.info("[SESSION:{}] Connected successfully", session.getSessionId());
             stompSession = session;
 
             Runnable runnable = () -> {
@@ -164,22 +144,44 @@ public class WebSocketConnector {
         @Override
         public void handleException(StompSession session, StompCommand command,
                                     StompHeaders headers, byte[] payload, Throwable exception) {
-            logger.error("[SESSION:{}] STOMP exception: {}", session.getSessionId(), exception.getMessage());
+            LOGGER.error("[SESSION:{}] STOMP exception: {}", session.getSessionId(), exception.getMessage());
         }
 
         @Override
         public void handleTransportError(StompSession session, Throwable exception) {
             if (exception instanceof ClosedChannelException || !session.isConnected()) {
-                logger.error("[SESSION:{}] Unable to handle message, connection is in closing/closed state", session.getSessionId());
+                LOGGER.error("[SESSION:{}] Unable to handle message, connection is in closing/closed state", session.getSessionId());
                 return;
             }
 
             if (exception.getMessage().equals("Connection closed")) {
-                logger.info("[SESSION:{}] Connection closed", session.getSessionId());
+                LOGGER.info("[SESSION:{}] Connection closed", session.getSessionId());
                 return;
             }
 
-            logger.error("[SESSION:{}] Unable to handle message due to occurred the error", session.getSessionId(), exception);
+            LOGGER.error("[SESSION:{}] Unable to handle message due to occurred the error", session.getSessionId(), exception);
+        }
+
+        private void periodicallyRefreshToken() throws Exception {
+            while (stompSession.isConnected()) {
+                var currentAuthToken = ssoService.getCurrentAuthToken();
+                var jwt = JWT.decode(currentAuthToken);
+                var expirationDate = jwt.getExpiresAt();
+                var refreshPeriod = DateUtils.addMinutes(expirationDate, -5);
+                var duration = Duration.ofMillis(refreshPeriod.getTime() - new Date().getTime());
+                TimeUnit.SECONDS.sleep(duration.getSeconds());
+
+                refreshAccessToken();
+            }
+        }
+
+        private void refreshAccessToken() throws Exception {
+            var previousAuthToken = ssoService.getCurrentAuthToken();
+            var currentAuthToken = ssoService.getAuthToken();
+            var refreshTokenCommand = new TokenRefreshCommand(previousAuthToken, currentAuthToken, CommandType.TOKEN_REFRESH);
+            var refreshTokenCommandPayload = objectMapper.writeValueAsBytes(refreshTokenCommand);
+            var refreshTokenHeaders = StompMessageFactory.sendHeaders("/v1/command");
+            stompSession.send(refreshTokenHeaders, refreshTokenCommandPayload);
         }
     }
 }

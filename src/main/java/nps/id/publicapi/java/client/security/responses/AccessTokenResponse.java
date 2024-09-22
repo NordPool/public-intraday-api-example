@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class AccessTokenResponse {
     @JsonProperty("access_token")
-    public String AccessToken;
+    public String accessToken;
     @JsonProperty("token_type")
-    public String TokenType;
+    public String tokenType;
     @JsonProperty("expires_in")
-    public int ExpiresIn;
+    public int expiresIn;
 }

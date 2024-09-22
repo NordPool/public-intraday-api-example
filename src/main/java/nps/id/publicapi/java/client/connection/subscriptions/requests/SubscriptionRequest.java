@@ -8,7 +8,7 @@ import lombok.Getter;
 import nps.id.publicapi.java.client.connection.subscriptions.helpers.DestinationHelper;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 public class SubscriptionRequest {
@@ -64,7 +64,7 @@ public class SubscriptionRequest {
         return new SubscriptionRequest(subscriptionId, "throttlingLimits", DestinationHelper.composeDestination(user, version, publishingMode, "throttlingLimits"), ThrottlingLimitsMessage.class);
     }
 
-    public static SubscriptionRequest capacities(String subscriptionId, String user, String version, PublishingMode publishingMode, int deliveryAreaId, ArrayList<Integer> additionalDeliveryAreas) {
+    public static SubscriptionRequest capacities(String subscriptionId, String user, String version, PublishingMode publishingMode, int deliveryAreaId, List<Integer> additionalDeliveryAreas) {
         var areas = additionalDeliveryAreas.stream().map(String::valueOf).toList();
         var additionalAreasPart = additionalDeliveryAreas.isEmpty()
                 ? ""

@@ -12,32 +12,26 @@ public final class StompMessageFactory {
 
     public static StompHeaders connectionHeaders(String authToken, long heartbeatOutgoingInterval)
     {
-        return new StompHeaders() {
-            {
-                put(Headers.Client.AcceptVersion, Arrays.asList("1.2","1.1","1.0"));
-                put(Headers.Client.AuthorizationToken, Collections.singletonList(authToken));
-                put(Headers.Heartbeat, Collections.singletonList("0," + heartbeatOutgoingInterval));
-            }
-        };
+        var stompHeaders = new StompHeaders();
+        stompHeaders.put(Headers.Client.ACCEPT_VERSION, Arrays.asList("1.2","1.1","1.0"));
+        stompHeaders.put(Headers.Client.AUTHORIZATION_TOKEN, Collections.singletonList(authToken));
+        stompHeaders.put(Headers.HEART_BEAT, Collections.singletonList("0," + heartbeatOutgoingInterval));
+        return stompHeaders;
     }
 
     public static StompHeaders subscribeHeaders(String destination, String id) {
-        return new StompHeaders() {
-            {
-                setDestination(destination);
-                setId(id);
-            }
-        };
+        var stompHeaders = new StompHeaders();
+        stompHeaders.setDestination(destination);
+        stompHeaders.setId(id);
+        return  stompHeaders;
     }
 
     public static StompHeaders sendHeaders(String destination) {
         var contentType = new MimeType("application", "json", StandardCharsets.UTF_8);
 
-        return new StompHeaders() {
-            {
-                setDestination(destination);
-                setContentType(contentType);
-            }
-        };
+        var stompHeaders = new StompHeaders();
+        stompHeaders.setDestination(destination);
+        stompHeaders.setContentType(contentType);
+        return  stompHeaders;
     }
 }
