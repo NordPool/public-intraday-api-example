@@ -1,10 +1,12 @@
 package nps.id.publicapi.java.client.connection.storage;
 
+import org.springframework.stereotype.Component;
+
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Component
 public class SimpleCacheStorage {
-
 
     private final Map<String, List<Object>> data = new ConcurrentHashMap<>();
 

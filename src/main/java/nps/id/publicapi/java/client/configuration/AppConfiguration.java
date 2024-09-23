@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import nps.id.publicapi.java.client.connection.storage.SimpleCacheStorage;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.TaskScheduler;
@@ -44,11 +43,5 @@ public class AppConfiguration {
     @Bean
     public HttpClient httpClient() {
         return HttpClient.newHttpClient();
-    }
-
-    // TODO: Verify if @Service/@Component is enougt and @Bean not required
-    @Bean
-    public SimpleCacheStorage simpleCacheStorage() {
-        return new SimpleCacheStorage();
     }
 }
