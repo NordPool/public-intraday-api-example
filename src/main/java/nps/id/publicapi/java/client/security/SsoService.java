@@ -62,12 +62,11 @@ public class SsoService {
                     .build();
 
             var response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-            currentAuthToken = objectMapper.readValue(response.body(), AccessTokenResponse.class).accessToken;
+            currentAuthToken = objectMapper.readValue(response.body(), AccessTokenResponse.class).getAccessToken();
             return currentAuthToken;
         } catch (JsonProcessingException e) {
             throw new TokenRequestFailedException("Failed to read auth token response body!", e);
-        }
-        catch(InterruptedException | IOException e) {
+        } catch(InterruptedException | IOException e) {
             throw new TokenRequestFailedException("Failed to retrieve auth token! Check username and password!", e);
         }
     }

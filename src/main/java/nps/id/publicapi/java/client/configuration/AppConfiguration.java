@@ -46,6 +46,7 @@ public class AppConfiguration {
         return HttpClient.newHttpClient();
     }
 
+    // TODO: Verify if @Service/@Component is enougt and @Bean not required
     @Bean
     public SimpleCacheStorage simpleCacheStorage() {
         return new SimpleCacheStorage();

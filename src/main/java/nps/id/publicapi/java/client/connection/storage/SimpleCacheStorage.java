@@ -1,19 +1,17 @@
 package nps.id.publicapi.java.client.connection.storage;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class SimpleCacheStorage {
 
 
-    private final HashMap<String, List<Object>> data = new HashMap<>();
+    private final Map<String, List<Object>> data = new ConcurrentHashMap<>();
 
     public SimpleCacheStorage() {}
 
     public <T> void setCache(String dataType, List<T> data, boolean overrideValues) {
-        var dataByType = this.data.get(dataType);
-        if (dataByType == null) {
-            this.data.put(dataType, new ArrayList<>());
-        }
+        this.data.computeIfAbsent(dataType, k -> new ArrayList<>());
 
         var entry = this.data.get(dataType);
         if (overrideValues) {
@@ -28,6 +26,6 @@ public class SimpleCacheStorage {
             return Collections.emptyList();
         }
 
-        return (List<T>)dataByType;
+        return (List<T>) dataByType;
     }
 }

@@ -103,9 +103,10 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
             sendInvalidOrderModificationRequest(tradingClient);
 
             waitMillis(3000);
-            System.out.println("============================================================ ");
-            System.out.println("Press 'x' key to unsubscribe, logout and close. . . ");
-            System.out.println("============================================================ ");
+
+            LOGGER.info("============================================================");
+            LOGGER.info("Press 'x' key to unsubscribe, logout and close. . .");
+            LOGGER.info("============================================================");
 
             // Set clients disconnection behaviour while closing app with 'x' key
             var key = System.in.read();
