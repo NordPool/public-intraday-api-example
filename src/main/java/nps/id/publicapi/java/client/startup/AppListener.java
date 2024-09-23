@@ -89,7 +89,6 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
 
             // Order
             // We wait some time in hope to get some example contracts and configurations that are needed for preparing example order request
-
             waitMillis(5000);
             sendOrderRequest(tradingClient);
             // Wait before order modification request
@@ -103,7 +102,6 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
             sendInvalidOrderModificationRequest(tradingClient);
 
             waitMillis(3000);
-
             LOGGER.info("============================================================");
             LOGGER.info("Press 'x' key to unsubscribe, logout and close. . .");
             LOGGER.info("============================================================");
@@ -120,10 +118,10 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
         }
     }
 
-    private void waitMillis(long milliseconds) {
+    private void waitMillis(long delayInMilliseconds) {
         Awaitility
                 .await()
-                .pollDelay(Duration.ofMillis(milliseconds))
+                .pollDelay(Duration.ofMillis(delayInMilliseconds))
                 .until(() -> true);
     }
 
@@ -249,7 +247,7 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
             return;
         }
 
-        var lastOrderEntryRequest = (OrderEntryRequest)lastOrderEntryRequestOptional.get();
+        var lastOrderEntryRequest = (OrderEntryRequest) lastOrderEntryRequestOptional.get();
         var lastOrderEntry = lastOrderEntryRequest.getOrders().getFirst();
 
         // Get last order execution report response for above order request (OrderId required for order modification request)
@@ -257,7 +255,7 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
                 .getFromCache(OrderExecutionReport.class.getName())
                 .reversed()
                 .stream()
-                .map(c -> (OrderExecutionReport)c)
+                .map(c -> (OrderExecutionReport) c)
                 .filter(oer -> oer.getOrders().size() == 1 && Objects.equals(oer.getOrders().getFirst().getClientOrderId(), lastOrderEntry.getClientOrderId()))
                 .findFirst();
         if (lastOrderExecutionReportOptional.isEmpty() || lastOrderExecutionReportOptional.get().getOrders().isEmpty()) {
@@ -306,8 +304,8 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
                 .withRequestId(String.valueOf(UUID.randomUUID()))
                 .withRejectPartially(false)
                 .withOrders(Collections.singletonList(new OrderEntry()
-                                .withClientOrderId(UUID.randomUUID().toString())
-                                .withPortfolioId(portfolioId))
+                        .withClientOrderId(UUID.randomUUID().toString())
+                        .withPortfolioId(portfolioId))
                 );
 
         LOGGER.info("[{}] Attempting to send incorrect order request.", stompClient.getClientTarget());
@@ -323,7 +321,7 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
                 );
 
         LOGGER.info("[{}] Attempting to send an incorrect order modification request.", stompClient.getClientTarget());
-        stompClient.send(orderModificationRequest,  DestinationHelper.composeDestination(VERSION, "orderModificationRequest"));
+        stompClient.send(orderModificationRequest, DestinationHelper.composeDestination(VERSION, "orderModificationRequest"));
     }
 
     private Triple<String, String, Long> getExampleContractPortfolioAndArea(StompClient stompClient) {
@@ -332,7 +330,7 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
         var exampleContracts = simpleCacheStorage
                 .getFromCache(ContractRow.class.getName())
                 .stream()
-                .map(c -> (ContractRow)c)
+                .map(c -> (ContractRow) c)
                 .filter(c -> c.getProductType() != ProductType.CUSTOM_BLOCK && c.getDlvryAreaState().stream().anyMatch(s -> s.getState() == ContractState.ACTI))
                 .toList();
         if (exampleContracts.isEmpty()) {
@@ -351,14 +349,14 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
         var examplePortfolios = simpleCacheStorage
                 .getFromCache(ConfigurationRow.class.getName())
                 .stream()
-                .map(c -> ((ConfigurationRow)c).getPortfolios())
+                .map(c -> ((ConfigurationRow) c).getPortfolios())
                 .flatMap(List::stream)
                 .filter(p -> p
                         .getAreas()
                         .stream()
                         .anyMatch(a -> exampleAreas
                                 .stream()
-                                .anyMatch(s -> s.getDlvryAreaId() == (long)a.getAreaId())
+                                .anyMatch(s -> s.getDlvryAreaId() == (long) a.getAreaId())
                         )
                 )
                 .toList();
@@ -375,10 +373,10 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
                 .stream()
                 .filter(a -> exampleAreas
                         .stream()
-                        .anyMatch(s -> s.getDlvryAreaId() == (long)a.getAreaId()))
+                        .anyMatch(s -> s.getDlvryAreaId() == (long) a.getAreaId()))
                 .findFirst()
                 .get();
 
-        return Triple.of(exampleRandomContract.getContractId(), exampleRandomPortfolioForContract.getId(), (long)deliveryAreaPortfolio.getAreaId());
+        return Triple.of(exampleRandomContract.getContractId(), exampleRandomPortfolioForContract.getId(), (long) deliveryAreaPortfolio.getAreaId());
     }
 }
