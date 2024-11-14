@@ -70,6 +70,10 @@ public class SubscriptionRequestBuilder {
         return SubscriptionRequest.capacities(getSubId(), user, version, publishingMode, deliveryAreaId, additionalDeliveryAreas);
     }
 
+    public SubscriptionRequest createAtcCapacities(PublishingMode publishingMode, int deliveryAreaId, List<Integer> additionalDeliveryAreas) {
+        return SubscriptionRequest.atcCapacities(getSubId(), user, version, publishingMode, deliveryAreaId, additionalDeliveryAreas);
+    }
+
     private String getSubId() {
         return "sub-" + ATOMIC_INTEGER.incrementAndGet();
     }
