@@ -1,6 +1,14 @@
 package nps.id.publicapi.java.client.connection.subscriptions.requests;
 
-import com.nordpool.id.publicapi.v1.*;
+import com.nordpool.id.publicapi.v1.AtcCapacityRow;
+import com.nordpool.id.publicapi.v1.CapacityRow;
+import com.nordpool.id.publicapi.v1.ConfigurationRow;
+import com.nordpool.id.publicapi.v1.ContractRow;
+import com.nordpool.id.publicapi.v1.DeliveryAreaRow;
+import com.nordpool.id.publicapi.v1.LocalViewRow;
+import com.nordpool.id.publicapi.v1.OrderExecutionReport;
+import com.nordpool.id.publicapi.v1.PrivateTradeRow;
+import com.nordpool.id.publicapi.v1.PublicTradeRow;
 import com.nordpool.id.publicapi.v1.statistic.PublicStatisticRow;
 import com.nordpool.id.publicapi.v1.throttlinglimit.ThrottlingLimitsMessage;
 import nps.id.publicapi.java.client.connection.enums.PublishingMode;
@@ -70,5 +78,13 @@ public class SubscriptionRequest {
                 ? ""
                 : "/" + String.join("-", areas);
         return new SubscriptionRequest(subscriptionId, "capacities", DestinationHelper.composeDestination(user, version, publishingMode, "capacities" + "/" + deliveryAreaId + additionalAreasPart), CapacityRow.class);
+    }
+
+    public static SubscriptionRequest atcCapacities(String subscriptionId, String user, String version, PublishingMode publishingMode, int deliveryAreaId, List<Integer> additionalDeliveryAreas) {
+        var areas = additionalDeliveryAreas.stream().map(String::valueOf).toList();
+        var additionalAreasPart = additionalDeliveryAreas.isEmpty()
+                ? ""
+                : "/" + String.join("-", areas);
+        return new SubscriptionRequest(subscriptionId, "atcCapacities", DestinationHelper.composeDestination(user, version, publishingMode, "atcCapacities" + "/" + deliveryAreaId + additionalAreasPart), AtcCapacityRow.class);
     }
 }

@@ -27,16 +27,22 @@ import nps.id.publicapi.java.client.security.options.CredentialsOptions;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Random;
+import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
     private static final Logger LOGGER = LogManager.getLogger(AppListener.class);
 
     private static final String VERSION = "v1";
-    private static final int DEMO_AREA = 2;
-
+    private static final int DEMO_AREA = 3; // Finland
+    private static final List<Integer> ADDITIONAL_AREAS = List.of(5, 6, 7, 10, 15);
     private final SimpleCacheStorage simpleCacheStorage;
     private final StompClientGenericFactory stompClientGenericFactory;
 
@@ -86,6 +92,9 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
 
             // Capacities
             subscribeCapacities(marketDataClient, PublishingMode.CONFLATED);
+
+            // AtcCapacities
+            subscribeAtcCapacities(marketDataClient, PublishingMode.CONFLATED);
 
             // Order
             // We wait some time in hope to get some example contracts and configurations that are needed for preparing example order request
@@ -195,6 +204,11 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
 
     private void subscribeCapacities(StompClient stompClient, PublishingMode publishingMode) throws SubscriptionFailedException {
         var subscription = subscribeRequestBuilder.createCapacities(publishingMode, DEMO_AREA);
+        stompClient.subscribe(subscription);
+    }
+
+    private void subscribeAtcCapacities(StompClient stompClient, PublishingMode publishingMode) throws SubscriptionFailedException {
+        var subscription = subscribeRequestBuilder.createAtcCapacities(publishingMode, DEMO_AREA, ADDITIONAL_AREAS);
         stompClient.subscribe(subscription);
     }
 
