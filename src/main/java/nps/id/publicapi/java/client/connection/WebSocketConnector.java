@@ -46,6 +46,7 @@ public class WebSocketConnector {
 
     private final WebSocketOptions webSocketOptions;
     private final WebSocketStompClient webSocketStompClient;
+    private String currentToken = null;
 
     @Getter
     private StompSession stompSession;
@@ -81,6 +82,7 @@ public class WebSocketConnector {
             var connectionHeaders = StompMessageFactory.connectionHeaders(authToken, webSocketOptions.getHeartbeatOutgoingInterval());
             var completableFuture = webSocketStompClient.connectAsync(uri, null, connectionHeaders, new StompSessionHandlerAdapterImpl());
             stompSession = completableFuture.get(10, TimeUnit.SECONDS);
+            currentToken = ssoService.getCurrentAuthToken();
         } catch (Exception e) {
             LOGGER.error(e);
         }
@@ -123,7 +125,6 @@ public class WebSocketConnector {
     }
 
 
-
     private final class StompSessionHandlerAdapterImpl extends StompSessionHandlerAdapter {
 
         @Override
@@ -164,7 +165,7 @@ public class WebSocketConnector {
 
         private void periodicallyRefreshToken() throws Exception {
             while (stompSession.isConnected()) {
-                var currentAuthToken = ssoService.getCurrentAuthToken();
+                var currentAuthToken = currentToken;
                 var jwt = JWT.decode(currentAuthToken);
                 var expirationDate = jwt.getExpiresAt();
                 var refreshPeriod = DateUtils.addMinutes(expirationDate, -5);
@@ -176,9 +177,9 @@ public class WebSocketConnector {
         }
 
         private void refreshAccessToken() throws Exception {
-            var previousAuthToken = ssoService.getCurrentAuthToken();
-            var currentAuthToken = ssoService.getAuthToken();
-            var refreshTokenCommand = new TokenRefreshCommand(previousAuthToken, currentAuthToken, CommandType.TOKEN_REFRESH);
+            var previousAuthToken = currentToken;
+            currentToken = ssoService.getAuthToken();
+            var refreshTokenCommand = new TokenRefreshCommand(previousAuthToken, currentToken, CommandType.TOKEN_REFRESH);
             var refreshTokenCommandPayload = objectMapper.writeValueAsBytes(refreshTokenCommand);
             var refreshTokenHeaders = StompMessageFactory.sendHeaders("/v1/command");
             stompSession.send(refreshTokenHeaders, refreshTokenCommandPayload);
