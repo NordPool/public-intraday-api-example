@@ -29,7 +29,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.channels.ClosedChannelException;
 import java.time.Duration;
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -78,11 +79,10 @@ public class WebSocketConnector {
 
         try {
             var uri = constructBaseUri();
-            var authToken = ssoService.getAuthToken();
-            var connectionHeaders = StompMessageFactory.connectionHeaders(authToken, webSocketOptions.getHeartbeatOutgoingInterval());
+            currentToken = ssoService.getAuthToken();
+            var connectionHeaders = StompMessageFactory.connectionHeaders(currentToken, webSocketOptions.getHeartbeatOutgoingInterval());
             var completableFuture = webSocketStompClient.connectAsync(uri, null, connectionHeaders, new StompSessionHandlerAdapterImpl());
             stompSession = completableFuture.get(10, TimeUnit.SECONDS);
-            currentToken = ssoService.getCurrentAuthToken();
         } catch (Exception e) {
             LOGGER.error(e);
         }
