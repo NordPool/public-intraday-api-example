@@ -31,9 +31,6 @@ public class SsoService {
 
     private final CredentialsOptions credentialsOptions;
 
-    @Getter
-    private String currentAuthToken = null;
-
     public SsoService(HttpClient httpClient, ObjectMapper objectMapper, SsoOptions ssoOptions, CredentialsOptions credentialsOptions)
     {
         this.httpClient = httpClient;
@@ -62,8 +59,7 @@ public class SsoService {
                     .build();
 
             var response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-            currentAuthToken = objectMapper.readValue(response.body(), AccessTokenResponse.class).getAccessToken();
-            return currentAuthToken;
+            return objectMapper.readValue(response.body(), AccessTokenResponse.class).getAccessToken();
         } catch (JsonProcessingException e) {
             throw new TokenRequestFailedException("Failed to read auth token response body!", e);
         } catch(InterruptedException | IOException e) {
