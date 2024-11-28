@@ -42,7 +42,7 @@ project.ext {
     commonsIoVersion = "2.16.1"
     httpClientVersion = "4.5.14"
     auth0JwtVersion = "4.2.1"
-    npsIntradayPublicApiVersion = "1.1.1"
+    npsIntradayPublicApiVersion = "1.1.16"
     awaitilityVersion = "4.2.2"
 }
 
