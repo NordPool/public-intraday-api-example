@@ -73,7 +73,7 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
             subscribeContracts(marketDataClient, PublishingMode.CONFLATED);
 
             // Local views
-            subscribeLocalViews(marketDataClient, PublishingMode.CONFLATED);
+            subscribeLocalViews(marketDataClient, PublishingMode.STREAMING);
 
             // Private trades
             subscribePrivateTrades(tradingClient, PublishingMode.STREAMING);

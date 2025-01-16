@@ -57,7 +57,7 @@ public class StompClient {
         var subscribeHeaders = StompMessageFactory.subscribeHeaders(request.getDestination(), request.getSubscriptionId());
         var subscription = session.subscribe(subscribeHeaders, new StompFrameHandlerImpl(simpleCacheStorage, objectMapper, clientTarget, request));
         subscriptions.put(request.getSubscriptionId(), subscription);
-        LOGGER.info("[{}][SubscriptionId:{}] Subscription created", clientTarget, subscription.getSubscriptionId());
+        LOGGER.info("[{}][SubscriptionId:{}][Destination:{}] Subscription created", clientTarget, request.getDestination(), subscription.getSubscriptionId());
         return subscription;
     }
 
