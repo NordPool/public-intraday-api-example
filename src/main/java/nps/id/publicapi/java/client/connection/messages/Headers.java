@@ -15,6 +15,7 @@ public final class Headers {
         public static final String AUTHORIZATION_TOKEN = "X-AUTH-TOKEN";
         public static final String ACCEPT_VERSION = "accept-version";
         public static final String SUBSCRIPTION_ID = "id";
+        public static final String SEC_WEBSOCKET_EXTENSIONS = "Sec-WebSocket-Extensions";
     }
 
     public static final class Server {

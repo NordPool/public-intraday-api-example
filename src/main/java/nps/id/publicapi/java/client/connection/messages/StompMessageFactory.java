@@ -2,6 +2,7 @@ package nps.id.publicapi.java.client.connection.messages;
 
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.util.MimeType;
+import org.springframework.web.socket.WebSocketHttpHeaders;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -19,11 +20,18 @@ public final class StompMessageFactory {
         return stompHeaders;
     }
 
+    public static WebSocketHttpHeaders handshakeHeaders(boolean enablePermessageDeflate)
+    {
+        var webSocketHttpHeaders = new WebSocketHttpHeaders();
+        webSocketHttpHeaders.put(Headers.Client.SEC_WEBSOCKET_EXTENSIONS, enablePermessageDeflate ? Collections.singletonList("permessage-deflate") : Collections.emptyList());
+        return webSocketHttpHeaders;
+    }
+
     public static StompHeaders subscribeHeaders(String destination, String id) {
         var stompHeaders = new StompHeaders();
         stompHeaders.setDestination(destination);
         stompHeaders.setId(id);
-        return  stompHeaders;
+        return stompHeaders;
     }
 
     public static StompHeaders sendHeaders(String destination) {

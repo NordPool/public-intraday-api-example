@@ -8,6 +8,7 @@ public interface WebSocketOptions
     int getHeartbeatOutgoingInterval();
     int getMaxTextMessageSize();
     int getMaxBinaryMessageSize();
+    boolean isEnablePermessageConflated();
 }
 
 
