@@ -34,7 +34,6 @@ import java.util.Date;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-
 public class WebSocketConnector {
     private static final Logger LOGGER = LogManager.getLogger(WebSocketConnector.class);
 
@@ -81,7 +80,8 @@ public class WebSocketConnector {
             var uri = constructBaseUri();
             currentToken = ssoService.getAuthToken();
             var connectionHeaders = StompMessageFactory.connectionHeaders(currentToken, webSocketOptions.getHeartbeatOutgoingInterval());
-            var completableFuture = webSocketStompClient.connectAsync(uri, null, connectionHeaders, new StompSessionHandlerAdapterImpl());
+            var handshakeHeaders = StompMessageFactory.handshakeHeaders(webSocketOptions.isEnablePermessageConflated());
+            var completableFuture = webSocketStompClient.connectAsync(uri, handshakeHeaders, connectionHeaders, new StompSessionHandlerAdapterImpl());
             stompSession = completableFuture.get(10, TimeUnit.SECONDS);
         } catch (Exception e) {
             LOGGER.error(e);

@@ -19,4 +19,6 @@ public class MarketDataWebSocketOptions implements WebSocketOptions {
     private int maxTextMessageSize;
     @Value("${market.data.max.binary.message.size}")
     private int maxBinaryMessageSize;
+    @Value("${market.enable.permessage.conflated}")
+    private boolean enablePermessageConflated;
 }

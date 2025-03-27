@@ -19,4 +19,6 @@ public class TradingWebSocketOptions implements WebSocketOptions {
     private int maxTextMessageSize;
     @Value("${trading.max.binary.message.size}")
     private int maxBinaryMessageSize;
+    @Value("${trading.enable.permessage.conflated}")
+    private boolean enablePermessageConflated;
 }
