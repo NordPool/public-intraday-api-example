@@ -55,7 +55,6 @@ credentials {
     password "your_github_access_token"
 }
 ```
-To access [Java Intraday API package](https://maven.pkg.github.com/NordPool/public-intraday-api) you will need privileges that can be obtained from [idapi@nordpoolgroup.com](mailto:idapi@nordpoolgroup.com).
 
 ## Important considerations ##
 
