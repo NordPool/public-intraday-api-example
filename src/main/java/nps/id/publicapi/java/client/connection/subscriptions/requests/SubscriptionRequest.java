@@ -11,6 +11,7 @@ import com.nordpool.id.publicapi.v1.PrivateTradeRow;
 import com.nordpool.id.publicapi.v1.PublicTradeRow;
 import com.nordpool.id.publicapi.v1.statistic.PublicStatisticRow;
 import com.nordpool.id.publicapi.v1.throttlinglimit.ThrottlingLimitsMessage;
+import com.nordpool.id.publicapi.v1.throttlinglimit.CompanyThrottlingLimitMessage;
 import nps.id.publicapi.java.client.connection.enums.PublishingMode;
 import lombok.Getter;
 import nps.id.publicapi.java.client.connection.subscriptions.helpers.DestinationHelper;
@@ -70,6 +71,10 @@ public class SubscriptionRequest {
 
     public static SubscriptionRequest throttlingLimits(String subscriptionId, String user, String version, PublishingMode publishingMode) {
         return new SubscriptionRequest(subscriptionId, "throttlingLimits", DestinationHelper.composeDestination(user, version, publishingMode, "throttlingLimits"), ThrottlingLimitsMessage.class);
+    }
+
+    public static SubscriptionRequest companyThrottlingLimits(String subscriptionId, String user, String version, PublishingMode publishingMode) {
+        return new SubscriptionRequest(subscriptionId, "companyThrottlingLimits", DestinationHelper.composeDestination(user, version, publishingMode, "companyThrottlingLimits"), CompanyThrottlingLimitMessage.class);
     }
 
     public static SubscriptionRequest capacities(String subscriptionId, String user, String version, PublishingMode publishingMode, int deliveryAreaId, List<Integer> additionalDeliveryAreas) {
