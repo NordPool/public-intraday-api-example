@@ -62,6 +62,10 @@ public class SubscriptionRequestBuilder {
         return  SubscriptionRequest.throttlingLimits(getSubId(), user, version, publishingMode);
     }
 
+    public SubscriptionRequest createCompanyThrottlingLimits(PublishingMode publishingMode) {
+        return  SubscriptionRequest.companyThrottlingLimits(getSubId(), user, version, publishingMode);
+    }
+
     public SubscriptionRequest createCapacities(PublishingMode publishingMode, int deliveryAreaId) {
         return createCapacities(publishingMode, deliveryAreaId, Collections.emptyList());
     }

@@ -90,6 +90,9 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
             // Throttling limits
             subscribeThrottlingLimits(tradingClient, PublishingMode.CONFLATED);
 
+            // Company throttling limits
+            subscribeCompanyThrottlingLimits(tradingClient, PublishingMode.CONFLATED);
+
             // Capacities
             subscribeCapacities(marketDataClient, PublishingMode.CONFLATED);
 
@@ -199,6 +202,25 @@ public class AppListener implements ApplicationListener<ContextRefreshedEvent> {
             executorService.schedule(runnable, 5, TimeUnit.SECONDS);
         } catch (Exception e) {
             LOGGER.info("[{}] An error occurred during throttling limits unsubscription, details: {}", stompClient.getClientTarget(), e.getMessage());
+        }
+    }
+
+    private void subscribeCompanyThrottlingLimits(StompClient stompClient, PublishingMode publishingMode) throws SubscriptionFailedException {
+        var subscription = subscribeRequestBuilder.createCompanyThrottlingLimits(publishingMode);
+        stompClient.subscribe(subscription);
+
+        // Set automatic unsubscription of throttling limit topic after 10s
+        try (ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor()) {
+            Runnable runnable = () -> {
+                try {
+                    stompClient.unsubscribe(subscription.getSubscriptionId());
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            };
+            executorService.schedule(runnable, 5, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            LOGGER.info("[{}] An error occurred during company throttling limits unsubscription, details: {}", stompClient.getClientTarget(), e.getMessage());
         }
     }
 
