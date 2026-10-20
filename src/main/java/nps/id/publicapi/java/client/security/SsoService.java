@@ -38,7 +38,7 @@ public class SsoService {
         this.ssoOptions = ssoOptions;
         this.credentialsOptions = credentialsOptions;
         grantType = "password";
-        scope = "global";
+        scope = "intraday_api";
     }
 
     public String getAuthToken() throws TokenRequestFailedException
